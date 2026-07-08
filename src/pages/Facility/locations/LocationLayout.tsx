@@ -35,6 +35,7 @@ import PrescriptionsView, {
 } from "@/pages/Facility/services/pharmacy/PrescriptionsView";
 import { PrintDispenseOrder } from "@/pages/Facility/services/pharmacy/PrintDispenseOrder";
 import { PrintMedicationReturn } from "@/pages/Facility/services/pharmacy/PrintMedicationReturn";
+import PatientServiceRequestDashboard from "@/pages/Facility/services/serviceRequests/PatientServiceRequestDashboard";
 import ServiceRequestList from "@/pages/Facility/services/serviceRequests/ServiceRequestList";
 import ServiceRequestShow from "@/pages/Facility/services/serviceRequests/ServiceRequestShow";
 import { SchedulableResourceType } from "@/types/scheduling/schedule";
@@ -143,6 +144,17 @@ const getRoutes = (facilityId: string, locationId: string) => ({
   // Laboratory
   "/service_requests": () => (
     <ServiceRequestList facilityId={facilityId} locationId={locationId} />
+  ),
+  "/service_requests/patient/:patientId": ({
+    patientId,
+  }: {
+    patientId: string;
+  }) => (
+    <PatientServiceRequestDashboard
+      facilityId={facilityId}
+      patientId={patientId}
+      locationId={locationId}
+    />
   ),
   "/service_requests/:serviceRequestId": ({
     serviceRequestId,

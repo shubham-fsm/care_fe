@@ -24,8 +24,10 @@ import { LocationLayout } from "@/pages/Facility/locations/LocationLayout";
 import { FacilityOverview } from "@/pages/Facility/overview";
 import FacilityServices from "@/pages/Facility/services/FacilityServices";
 import { ServiceLayout } from "@/pages/Facility/services/ServiceLayout";
+import ConsolidatedDiagnosticReportPrint from "@/pages/Facility/services/diagnosticReports/ConsolidatedDiagnosticReportPrint";
 import DiagnosticReportPrint from "@/pages/Facility/services/diagnosticReports/DiagnosticReportPrint";
 import DiagnosticReportView from "@/pages/Facility/services/diagnosticReports/DiagnosticReportView";
+import PatientServiceRequestDashboard from "@/pages/Facility/services/serviceRequests/PatientServiceRequestDashboard";
 import ServiceRequestShow from "@/pages/Facility/services/serviceRequests/ServiceRequestShow";
 import { SettingsLayout } from "@/pages/Facility/settings/layout";
 
@@ -56,6 +58,15 @@ const FacilityRoutes: AppRoutes = {
   "/facility/:facilityId/services/:serviceId*": ({ facilityId, serviceId }) => (
     <ServiceLayout facilityId={facilityId} serviceId={serviceId} />
   ),
+  "/facility/:facilityId/service_requests/patient/:patientId": ({
+    facilityId,
+    patientId,
+  }) => (
+    <PatientServiceRequestDashboard
+      facilityId={facilityId}
+      patientId={patientId}
+    />
+  ),
   "/facility/:facilityId/service_requests/:serviceRequestId": ({
     facilityId,
     serviceRequestId,
@@ -65,6 +76,11 @@ const FacilityRoutes: AppRoutes = {
       serviceRequestId={serviceRequestId}
     />
   ),
+
+  "/facility/:facilityId/patient/:patientId/diagnostic_reports/consolidated/print":
+    ({ patientId }) => (
+      <ConsolidatedDiagnosticReportPrint patientId={patientId} />
+    ),
 
   ...[
     "/facility/:facilityId/patient/:patientId/diagnostic_reports/:diagnosticReportId",

@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ScanQrCode } from "lucide-react";
 import { navigate } from "raviger";
 import { useEffect, useMemo, useState } from "react";
@@ -17,12 +17,10 @@ import {
   TableSkeleton,
 } from "@/components/Common/SkeletonLoading";
 import SpecimenIDScanDialog from "@/components/Scan/SpecimenIDScanDialog";
-import ServiceRequestTable from "@/components/ServiceRequest/ServiceRequestTable";
 
 import useFilters from "@/hooks/useFilters";
 
 import PatientIdentifierFilter from "@/components/Patient/PatientIdentifierFilter";
-import TagAssignmentSheet from "@/components/Tags/TagAssignmentSheet";
 import { ActivityDefinitionFilterValue } from "@/components/ui/multi-filter/activityDefinitionFilter";
 import {
   activityDefinitionFilter,
@@ -44,16 +42,28 @@ import {
   Priority,
   SERVICE_REQUEST_PRIORITY_COLORS,
   SERVICE_REQUEST_STATUS_COLORS,
-  type ServiceRequestReadSpec,
   Status,
 } from "@/types/emr/serviceRequest/serviceRequest";
 import serviceRequestApi from "@/types/emr/serviceRequest/serviceRequestApi";
-import { TagConfig, TagResource } from "@/types/emr/tagConfig/tagConfig";
+import {
+  getTagHierarchyDisplay,
+  TagConfig,
+  TagResource,
+} from "@/types/emr/tagConfig/tagConfig";
 import useTagConfigs from "@/types/emr/tagConfig/useTagConfig";
 import locationApi from "@/types/location/locationApi";
 import { ShortcutBadge } from "@/Utils/keyboardShortcutComponents";
 import query from "@/Utils/request/query";
 import { dateQueryString, dateTimeQueryString } from "@/Utils/utils";
+
+import PatientGroupedServiceRequestTable from "./components/PatientGroupedServiceRequestTable";
+import {
+  getGroupPriority,
+  getGroupStatus,
+  getGroupTags,
+  groupServiceRequestsByPatient,
+  PatientRequestGroup,
+} from "./utils/groupServiceRequestsByPatient";
 
 function EmptyState() {
   const { t } = useTranslation();
@@ -73,62 +83,71 @@ function EmptyState() {
 }
 
 function ServiceRequestCard({
-  request,
+  group,
   facilityId,
   locationId,
 }: {
-  request: ServiceRequestReadSpec;
+  group: PatientRequestGroup;
   facilityId: string;
   locationId: string;
 }) {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
+  const status = getGroupStatus(group);
+  const priority = getGroupPriority(group);
+  const tags = getGroupTags(group);
 
   return (
     <Card>
       <CardContent className="p-4">
         <div className="mb-2 flex flex-col sm:flex-row sm:items-start gap-4">
           <div className="flex-1 min-w-0">
-            <div className="mb-2">
+            <div
+              className="mb-2 cursor-pointer hover:underline w-fit"
+              onClick={() =>
+                navigate(
+                  `/facility/${facilityId}/locations/${locationId}/service_requests/patient/${group.patientId}`,
+                )
+              }
+            >
               <div className="font-semibold text-gray-900">
-                {request.encounter.patient.name}
+                {group.patientName}
               </div>
-              <div className="text-xs text-gray-500">
-                {request.encounter.patient.id}
-              </div>
+              <div className="text-xs text-gray-500">{group.patientId}</div>
             </div>
             <div className="mb-2 flex items-center gap-2">
-              <Badge variant={SERVICE_REQUEST_STATUS_COLORS[request.status]}>
-                {t(request.status)}
+              <Badge variant={SERVICE_REQUEST_STATUS_COLORS[status]}>
+                {t(status)}
               </Badge>
-              <Badge
-                variant={SERVICE_REQUEST_PRIORITY_COLORS[request.priority]}
-              >
-                {t(request.priority)}
+              <Badge variant={SERVICE_REQUEST_PRIORITY_COLORS[priority]}>
+                {t(priority)}
               </Badge>
             </div>
             <div>
-              <div className="text-lg">{request.title || "-"}</div>
-              {request.code?.display && (
-                <div className="text-xs text-gray-500">
-                  {request.code.display}
+              <div className="text-xs text-gray-500 mb-1">
+                {t("tests_count", { count: group.requests.length })}
+              </div>
+              <div className="flex flex-col gap-1">
+                {group.requests.map((request) => (
+                  <div key={request.id} className="text-lg">
+                    {request.title || "-"}
+                  </div>
+                ))}
+              </div>
+              {/* Tags */}
+              {tags.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {tags.map((tag) => (
+                    <Badge
+                      key={tag.id}
+                      variant="secondary"
+                      className="capitalize"
+                      title={tag.description}
+                    >
+                      {getTagHierarchyDisplay(tag)}
+                    </Badge>
+                  ))}
                 </div>
               )}
-              {/* Tags */}
-              <div className="mt-2 flex flex-wrap gap-1">
-                <TagAssignmentSheet
-                  entityType="service_request"
-                  entityId={request.id}
-                  facilityId={facilityId}
-                  currentTags={request.tags}
-                  onUpdate={() => {
-                    queryClient.invalidateQueries({
-                      queryKey: ["serviceRequests", facilityId],
-                    });
-                  }}
-                  patientId={request.encounter.patient.id}
-                />
-              </div>
             </div>
           </div>
           <Button
@@ -136,7 +155,7 @@ function ServiceRequestCard({
             size="sm"
             onClick={() =>
               navigate(
-                `/facility/${facilityId}/locations/${locationId}/service_requests/${request.id}`,
+                `/facility/${facilityId}/locations/${locationId}/service_requests/patient/${group.patientId}`,
               )
             }
           >
@@ -328,6 +347,10 @@ export default function ServiceRequestList({
   });
 
   const serviceRequests = response?.results || [];
+  const patientGroups = useMemo(
+    () => groupServiceRequestsByPatient(response?.results ?? []),
+    [response?.results],
+  );
 
   return (
     <Page title={t("service_requests")} hideTitleOnPage>
@@ -421,10 +444,10 @@ export default function ServiceRequestList({
           <>
             {/* Mobile View */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 md:hidden">
-              {serviceRequests.map((request) => (
+              {patientGroups.map((group) => (
                 <ServiceRequestCard
-                  key={request.id}
-                  request={request}
+                  key={group.patientId}
+                  group={group}
                   facilityId={facilityId}
                   locationId={locationId}
                 />
@@ -433,15 +456,14 @@ export default function ServiceRequestList({
 
             {/* Desktop View */}
             <div className="hidden md:block">
-              <ServiceRequestTable
-                requests={serviceRequests}
+              <PatientGroupedServiceRequestTable
+                groups={patientGroups}
                 facilityId={facilityId}
                 locationId={locationId}
-                onPatientClick={(request) =>
-                  updateQuery({
-                    patient: request.encounter.patient.id,
-                    patient_name: request.encounter.patient.name,
-                  })
+                onPatientClick={(group) =>
+                  navigate(
+                    `/facility/${facilityId}/locations/${locationId}/service_requests/patient/${group.patientId}`,
+                  )
                 }
               />
             </div>
