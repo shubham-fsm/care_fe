@@ -1,3 +1,4 @@
+import { useCallNextAfterEncounterTokenClosed } from "@/pages/Facility/queues/useCompleteQueueToken";
 import {
   EncounterRead,
   EncounterStatus,
@@ -27,9 +28,17 @@ export function useEncounterProgressController({
 }) {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+  const callNextAfterTokenClosed =
+    useCallNextAfterEncounterTokenClosed(encounter);
 
   const { mutate: executeBatch, isPending } = useBatchRequest({
     onSuccess: ({ results }) => {
+      // The patient's queue token was completed with the visit: call the
+      // next patient to the same service point (auto-call).
+      if (results.some((r) => r.reference_id === "token-closed")) {
+        void callNextAfterTokenClosed();
+      }
+
       if (results.some((r) => r.reference_id === "encounter-closed")) {
         queryClient.invalidateQueries({
           queryKey: ["encounter", encounter.id],

@@ -65,4 +65,16 @@ function usePreferredServicePointCategory({
   } as const;
 }
 
-export { usePreferredServicePointCategory };
+/**
+ * The category preferred for each service point (service point id to
+ * category id), without loading categories. Safe outside queue pages.
+ */
+function usePreferredServicePointCategoryIds() {
+  const [preferredServicePointCategoryIds] = useAtom(atom);
+  return preferredServicePointCategoryIds;
+}
+
+export {
+  usePreferredServicePointCategory,
+  usePreferredServicePointCategoryIds,
+};

@@ -121,7 +121,7 @@ async function hasCalledToken({
  *
  * Resolves with the token that was called, or `null` when no token is waiting.
  */
-async function callNextTokenToServicePoint({
+export async function callNextTokenToServicePoint({
   facilityId,
   queueId,
   subQueueId,
@@ -175,7 +175,10 @@ export function useCallNextTokenFn({
   const { tokenCategories, preferredServicePointCategories } =
     usePreferredServicePointCategory({ facilityId });
 
-  return (subQueueId: string, { onlyIfNoneCalled = false } = {}) =>
+  return (
+    subQueueId: string,
+    { onlyIfNoneCalled = false }: { onlyIfNoneCalled?: boolean } = {},
+  ) =>
     callNextTokenToServicePoint({
       facilityId,
       queueId,
