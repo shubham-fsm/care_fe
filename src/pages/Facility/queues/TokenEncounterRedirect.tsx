@@ -63,7 +63,7 @@ const TokenEncounterRedirect = ({
       .finally(() => setStartServiceDone(true));
   }, [token, needsStartService, facilityId, queueId, tokenId, queryClient]);
 
-  if (isTokenLoading || !token?.patient?.id || isStartingService) {
+  if (isTokenLoading || !token || isStartingService) {
     return <Loading />;
   }
 
