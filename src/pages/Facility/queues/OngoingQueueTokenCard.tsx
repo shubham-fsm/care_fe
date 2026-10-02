@@ -104,7 +104,11 @@ function useTokenActions({
         updated.status === TokenStatus.UNFULFILLED;
       let next: TokenRead | null = null;
       if (freesServicePoint && autoCallNext && servicePointId) {
-        next = await callNextToken(servicePointId).catch(() => null);
+        // Skip when a patient is already called there (e.g. a re-called
+        // missed patient), so two patients are not called at once.
+        next = await callNextToken(servicePointId, {
+          onlyIfNoneCalled: true,
+        }).catch(() => null);
       }
       return { updated, next };
     },

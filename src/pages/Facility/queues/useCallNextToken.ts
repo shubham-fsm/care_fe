@@ -88,6 +88,30 @@ async function findNextWaitingToken({
 }
 
 /**
+ * Whether a patient has already been called to the service point and has not
+ * arrived yet (for example a missed patient who was re-called).
+ */
+async function hasCalledToken({
+  facilityId,
+  queueId,
+  subQueueId,
+}: {
+  facilityId: string;
+  queueId: string;
+  subQueueId: string;
+}): Promise<boolean> {
+  const { results } = await callApi(tokenApi.list, {
+    pathParams: { facility_id: facilityId, queue_id: queueId },
+    queryParams: {
+      status: TokenStatus.CREATED,
+      sub_queue: subQueueId,
+      limit: 1,
+    },
+  });
+  return results.length > 0;
+}
+
+/**
  * Calls the next waiting token to a service point.
  *
  * The token is moved to "Called" (assigned to the service point, not yet
@@ -102,12 +126,20 @@ async function callNextTokenToServicePoint({
   queueId,
   subQueueId,
   categoryOrder,
+  onlyIfNoneCalled = false,
 }: {
   facilityId: string;
   queueId: string;
   subQueueId: string;
   categoryOrder: (string | undefined)[];
+  onlyIfNoneCalled?: boolean;
 }): Promise<TokenRead | null> {
+  if (
+    onlyIfNoneCalled &&
+    (await hasCalledToken({ facilityId, queueId, subQueueId }))
+  ) {
+    return null;
+  }
   const next = await findNextWaitingToken({
     facilityId,
     queueId,
@@ -130,6 +162,8 @@ async function callNextTokenToServicePoint({
  * Returns a function that calls the next waiting token to a service point,
  * giving priority categories (e.g. Emergency) precedence over the rest, and
  * respecting the category the service point has been set to serve.
+ * With `onlyIfNoneCalled`, nothing is called while another patient is
+ * already called to that service point and has not arrived yet.
  */
 export function useCallNextTokenFn({
   facilityId,
@@ -141,11 +175,12 @@ export function useCallNextTokenFn({
   const { tokenCategories, preferredServicePointCategories } =
     usePreferredServicePointCategory({ facilityId });
 
-  return (subQueueId: string) =>
+  return (subQueueId: string, { onlyIfNoneCalled = false } = {}) =>
     callNextTokenToServicePoint({
       facilityId,
       queueId,
       subQueueId,
+      onlyIfNoneCalled,
       categoryOrder: getCategoryCallOrder(
         preferredServicePointCategories?.[subQueueId]?.id,
         tokenCategories,
