@@ -2,11 +2,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
-import { TokenRead } from "@/types/tokens/token/token";
+import { TokenRead, TokenStatus } from "@/types/tokens/token/token";
+import tokenApi from "@/types/tokens/token/tokenApi";
 import { TokenCategoryRead } from "@/types/tokens/tokenCategory/tokenCategory";
-import tokenQueueApi from "@/types/tokens/tokenQueue/tokenQueueApi";
 import { callApi } from "@/Utils/request/query";
-import { HTTPError } from "@/Utils/request/types";
 
 import { usePreferredServicePointCategory } from "./usePreferredServicePointCategory";
 
@@ -58,8 +57,43 @@ export function getCategoryCallOrder(
 }
 
 /**
- * Calls the next waiting token in the queue to the given service point,
- * trying each category in `categoryOrder` until one has a waiting token.
+ * The oldest token still waiting in the queue (not yet called to any
+ * service point), trying each category in `categoryOrder` in turn.
+ */
+async function findNextWaitingToken({
+  facilityId,
+  queueId,
+  categoryOrder,
+}: {
+  facilityId: string;
+  queueId: string;
+  categoryOrder: (string | undefined)[];
+}): Promise<TokenRead | null> {
+  for (const category of categoryOrder) {
+    const { results } = await callApi(tokenApi.list, {
+      pathParams: { facility_id: facilityId, queue_id: queueId },
+      queryParams: {
+        status: TokenStatus.CREATED,
+        sub_queue_is_null: true,
+        ordering: "created_date",
+        limit: 1,
+        ...(category ? { category } : {}),
+      },
+    });
+    if (results[0]) {
+      return results[0];
+    }
+  }
+  return null;
+}
+
+/**
+ * Calls the next waiting token to a service point.
+ *
+ * The token is moved to "Called" (assigned to the service point, not yet
+ * being served) so that the waiting-area display keeps announcing it until
+ * the patient actually arrives. It becomes "Now serving" when the doctor
+ * opens its encounter (see TokenEncounterRedirect) or marks it as serving.
  *
  * Resolves with the token that was called, or `null` when no token is waiting.
  */
@@ -74,23 +108,22 @@ async function callNextTokenToServicePoint({
   subQueueId: string;
   categoryOrder: (string | undefined)[];
 }): Promise<TokenRead | null> {
-  for (const category of categoryOrder) {
-    try {
-      return await callApi(tokenQueueApi.setNextTokenToSubQueue, {
-        pathParams: { facility_id: facilityId, id: queueId },
-        body: { sub_queue: subQueueId, category },
-        silent: true,
-      });
-    } catch (error) {
-      // The backend responds with 400 when no token is waiting in the
-      // requested category; try the next category in the order.
-      if (error instanceof HTTPError && error.status === 400) {
-        continue;
-      }
-      throw error;
-    }
+  const next = await findNextWaitingToken({
+    facilityId,
+    queueId,
+    categoryOrder,
+  });
+  if (!next) {
+    return null;
   }
-  return null;
+  return callApi(tokenApi.update, {
+    pathParams: { facility_id: facilityId, queue_id: queueId, id: next.id },
+    body: {
+      status: TokenStatus.CREATED,
+      note: next.note,
+      sub_queue: subQueueId,
+    },
+  });
 }
 
 /**
