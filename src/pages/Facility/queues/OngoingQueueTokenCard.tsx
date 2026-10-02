@@ -94,16 +94,16 @@ function useTokenActions({
         body,
       });
 
-      // Auto-call: once a token is completed, the service point that served
-      // it gets the next waiting token without a separate click. A failure
-      // here must not undo or hide the completion, so it is caught.
+      // Auto-call: once a token is completed, or its patient did not turn up
+      // (moved to awaiting re-call), the service point it was at gets the next
+      // waiting token without a separate click. A failure here must not undo
+      // or hide the update, so it is caught.
       const servicePointId = token.sub_queue?.id;
+      const freesServicePoint =
+        updated.status === TokenStatus.FULFILLED ||
+        updated.status === TokenStatus.UNFULFILLED;
       let next: TokenRead | null = null;
-      if (
-        updated.status === TokenStatus.FULFILLED &&
-        autoCallNext &&
-        servicePointId
-      ) {
+      if (freesServicePoint && autoCallNext && servicePointId) {
         next = await callNextToken(servicePointId).catch(() => null);
       }
       return { updated, next };
@@ -127,17 +127,31 @@ function useTokenActions({
   const items: TokenActionItem[] = [];
 
   if (token.status === TokenStatus.CREATED && token.sub_queue) {
-    items.push({
-      key: "mark_as_now_serving",
-      label: t("mark_as_now_serving"),
-      icon: <CircleDot className="size-4 mr-2" />,
-      onSelect: () =>
-        updateToken({
-          status: TokenStatus.IN_PROGRESS,
-          note: token.note,
-          sub_queue: token.sub_queue?.id || null,
-        }),
-    });
+    items.push(
+      {
+        key: "mark_as_now_serving",
+        label: t("mark_as_now_serving"),
+        icon: <CircleDot className="size-4 mr-2" />,
+        onSelect: () =>
+          updateToken({
+            status: TokenStatus.IN_PROGRESS,
+            note: token.note,
+            sub_queue: token.sub_queue?.id || null,
+          }),
+      },
+      {
+        // A called patient who does not turn up goes to awaiting re-call.
+        key: "move_to_awaiting_recall_called",
+        label: t("move_to_awaiting_recall"),
+        icon: <BringToFront className="size-4 mr-2" />,
+        onSelect: () =>
+          updateToken({
+            status: TokenStatus.UNFULFILLED,
+            note: token.note,
+            sub_queue: null,
+          }),
+      },
+    );
   }
 
   if (token.status === TokenStatus.IN_PROGRESS) {
