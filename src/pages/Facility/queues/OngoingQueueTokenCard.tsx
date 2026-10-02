@@ -18,6 +18,10 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { CancelTokenDialog } from "@/pages/Facility/queues/CancelTokenDialog";
+import {
+  useAutoCallNextPreference,
+  useCallNextTokenFn,
+} from "@/pages/Facility/queues/useCallNextToken";
 import { useQueueServicePoints } from "@/pages/Facility/queues/useQueueServicePoints";
 import {
   getQueueTokenStatus,
@@ -25,9 +29,11 @@ import {
   renderTokenNumber,
   TokenRead,
   TokenStatus,
+  TokenUpdate,
 } from "@/types/tokens/token/token";
 import tokenApi from "@/types/tokens/token/tokenApi";
 import mutate from "@/Utils/request/mutate";
+import { callApi } from "@/Utils/request/query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   BringToFront,
@@ -71,24 +77,49 @@ function useTokenActions({
   const { t } = useTranslation();
   const { assignedServicePoints } = useQueueServicePoints();
   const queryClient = useQueryClient();
+  const [autoCallNext] = useAutoCallNextPreference();
+  const callNextToken = useCallNextTokenFn({
+    facilityId,
+    queueId: token.queue.id,
+  });
 
   const { mutate: updateToken } = useMutation({
-    mutationFn: mutate(tokenApi.update, {
-      pathParams: {
-        facility_id: facilityId,
-        queue_id: token.queue.id,
-        id: token.id,
-      },
-    }),
-    onSuccess: (data: TokenRead) => {
+    mutationFn: async (body: TokenUpdate) => {
+      const updated = await callApi(tokenApi.update, {
+        pathParams: {
+          facility_id: facilityId,
+          queue_id: token.queue.id,
+          id: token.id,
+        },
+        body,
+      });
+
+      // Auto-call: once a token is completed, the service point that served
+      // it gets the next waiting token without a separate click. A failure
+      // here must not undo or hide the completion, so it is caught.
+      const servicePointId = token.sub_queue?.id;
+      let next: TokenRead | null = null;
+      if (
+        updated.status === TokenStatus.FULFILLED &&
+        autoCallNext &&
+        servicePointId
+      ) {
+        next = await callNextToken(servicePointId).catch(() => null);
+      }
+      return { updated, next };
+    },
+    onSuccess: ({ updated, next }) => {
       queryClient.invalidateQueries({
         queryKey: ["infinite-tokens", facilityId, token.queue.id],
       });
       queryClient.invalidateQueries({
         queryKey: ["token-queue-summary", facilityId, token.queue.id],
       });
-      if (data.status === TokenStatus.FULFILLED) {
+      if (updated.status === TokenStatus.FULFILLED) {
         toast.success(t("token_has_been_completed"));
+      }
+      if (next) {
+        toast.success(t("token_called", { token: renderTokenNumber(next) }));
       }
     },
   });

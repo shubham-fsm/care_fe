@@ -15,7 +15,9 @@ import {
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
@@ -32,14 +34,21 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { OngoingQueueTokenCardsList } from "@/pages/Facility/queues/OngoingQueueTokenCard";
+import {
+  useAutoCallNextPreference,
+  useCallNextToken,
+} from "@/pages/Facility/queues/useCallNextToken";
 import { usePreferredServicePointCategory } from "@/pages/Facility/queues/usePreferredServicePointCategory";
 import { getTokenQueueStatusCount } from "@/pages/Facility/queues/utils";
-import { TokenRead, TokenStatus } from "@/types/tokens/token/token";
+import {
+  renderTokenNumber,
+  TokenRead,
+  TokenStatus,
+} from "@/types/tokens/token/token";
 import tokenCategoryApi from "@/types/tokens/tokenCategory/tokenCategoryApi";
 import tokenQueueApi from "@/types/tokens/tokenQueue/tokenQueueApi";
-import mutate from "@/Utils/request/mutate";
 import query from "@/Utils/request/query";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   ChevronDownIcon,
   DoorOpenIcon,
@@ -52,6 +61,7 @@ import {
 import { useQueryParams } from "raviger";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { ServicePointsDropDown } from "./ServicePointsDropDown";
 import { useQueueServicePoints } from "./useQueueServicePoints";
 
@@ -399,6 +409,7 @@ function InServiceColumnOptions({
 
   const { preferredServicePointCategories, setPreferredServicePointCategory } =
     usePreferredServicePointCategory({ facilityId });
+  const [autoCallNext, setAutoCallNext] = useAutoCallNextPreference();
   const { resourceType } = useScheduleResourceFromPath();
 
   const { data: tokenCategories } = useQuery({
@@ -470,6 +481,13 @@ function InServiceColumnOptions({
               </RadioGroup>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
+          <DropdownMenuSeparator />
+          <DropdownMenuCheckboxItem
+            checked={autoCallNext}
+            onCheckedChange={(checked) => setAutoCallNext(checked === true)}
+          >
+            {t("auto_call_next_on_complete")}
+          </DropdownMenuCheckboxItem>
           {/* <DropdownMenuItem>Transfer all</DropdownMenuItem> */}
         </DropdownMenuContent>
       </DropdownMenu>
@@ -527,38 +545,31 @@ function CallNextPatientButton({
   facilityId: string;
   queueId: string;
 } & React.ComponentProps<typeof Button>) {
-  const { preferredServicePointCategories } = usePreferredServicePointCategory({
+  const { t } = useTranslation();
+  const { mutate: callNextToken, isPending } = useCallNextToken({
     facilityId,
-  });
-
-  const queryClient = useQueryClient();
-
-  const {
-    mutate: setNextTokenToSubQueue,
-    isPending: isSettingNextTokenToSubQueue,
-  } = useMutation({
-    mutationFn: mutate(tokenQueueApi.setNextTokenToSubQueue, {
-      pathParams: { facility_id: facilityId, id: queueId },
-    }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["infinite-tokens", facilityId, queueId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["token-queue-summary", facilityId, queueId],
-      });
-    },
+    queueId,
   });
 
   return (
     <Button
       {...props}
-      disabled={isSettingNextTokenToSubQueue}
+      disabled={isPending}
       onClick={() => {
-        setNextTokenToSubQueue({
-          sub_queue: subQueueId,
-          category: preferredServicePointCategories?.[subQueueId]?.id,
-        });
+        callNextToken(
+          { subQueueId },
+          {
+            onSuccess: (token) => {
+              if (token) {
+                toast.success(
+                  t("token_called", { token: renderTokenNumber(token) }),
+                );
+              } else {
+                toast.info(t("no_patient_is_waiting"));
+              }
+            },
+          },
+        );
       }}
     />
   );

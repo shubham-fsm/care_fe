@@ -59,6 +59,7 @@ function usePreferredServicePointCategory({
   };
 
   return {
+    tokenCategories: tokenCategories?.results,
     preferredServicePointCategories,
     setPreferredServicePointCategory,
   } as const;
