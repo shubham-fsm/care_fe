@@ -56,6 +56,7 @@ import { validateMedicationStatementQuestion } from "./QuestionTypes/MedicationS
 import { isQuestionEnabled } from "./QuestionTypes/QuestionGroup";
 import { QuestionnaireSearch } from "./QuestionnaireSearch";
 import { FIXED_QUESTIONNAIRES } from "./data/StructuredFormData";
+import { ScribeButton } from "./scribe/ScribeButton";
 import { getStructuredRequests } from "./structured/handlers";
 
 import queryClient from "@/Utils/request/queryClient";
@@ -1025,6 +1026,22 @@ export function QuestionnaireForm({
                   </p>
                 )}
               </div>
+              {index === 0 && encounterId && encounterId !== "preview" && (
+                <ScribeButton
+                  form={form}
+                  disabled={isPending}
+                  onFormChange={(updated) => {
+                    setQuestionnaireForms((prev) =>
+                      prev.map((f) =>
+                        f.questionnaire.id === updated.questionnaire.id
+                          ? { ...updated, errors: [] }
+                          : f,
+                      ),
+                    );
+                    setIsDirty(true);
+                  }}
+                />
+              )}
               {form.questionnaire.slug !== questionnaireSlug && (
                 <Button
                   type="button"
