@@ -17,6 +17,7 @@ import type { QuestionnaireFormState } from "@/components/Questionnaire/Question
 import { ScribeResult } from "@/types/scribe/scribe";
 import scribeApi from "@/types/scribe/scribeApi";
 import { callApi } from "@/Utils/request/query";
+import { HTTPError } from "@/Utils/request/types";
 
 import { applyScribeAnswers, scribeQuestions } from "./applyScribeAnswers";
 import { toWav16kMono } from "./wav";
@@ -93,8 +94,16 @@ export function ScribeButton({
       } else {
         toast.info(t("scribe_no_fields_filled"));
       }
-    } catch {
-      toast.error(t("scribe_failed"));
+    } catch (error) {
+      // Show the server's reason (e.g. Gemini key or model problems) so the
+      // problem can be fixed without reading server logs.
+      const detail =
+        error instanceof HTTPError ? error.cause?.detail : undefined;
+      toast.error(
+        typeof detail === "string" && detail
+          ? `${t("scribe_failed")} ${detail}`
+          : t("scribe_failed"),
+      );
     } finally {
       setPhase("idle");
     }
@@ -188,7 +197,9 @@ export function ScribeButton({
           {result && (
             <div className="space-y-5 px-4 pb-6 text-sm">
               <section className="space-y-1">
-                <h3 className="text-sm font-semibold">{t("scribe_transcript")}</h3>
+                <h3 className="text-sm font-semibold">
+                  {t("scribe_transcript")}
+                </h3>
                 <p className="whitespace-pre-wrap rounded-md bg-gray-50 p-3 text-gray-700">
                   {result.transcript || "—"}
                 </p>
