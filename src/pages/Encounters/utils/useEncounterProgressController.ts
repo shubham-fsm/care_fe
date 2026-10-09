@@ -110,7 +110,7 @@ export function useEncounterProgressController({
     }
   };
 
-  const completeEverything = () => {
+  const completeEverything = (options?: { onSuccess?: () => void }) => {
     if (encounterRequiresDischarge(encounter)) {
       navigate(
         `/facility/${encounter.facility.id}/patient/${encounter.patient.id}/encounter/${encounter.id}/questionnaire/encounter?toDischarge=true`,
@@ -127,7 +127,7 @@ export function useEncounterProgressController({
     if (tokenRequest) {
       requests.push(tokenRequest);
     }
-    executeBatch(requests);
+    executeBatch(requests, { onSuccess: () => options?.onSuccess?.() });
   };
 
   const completeEncounter = () => {

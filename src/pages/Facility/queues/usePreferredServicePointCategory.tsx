@@ -64,4 +64,16 @@ function usePreferredServicePointCategory({
   } as const;
 }
 
-export { usePreferredServicePointCategory };
+/**
+ * The preferred token category id of each service point, without resolving
+ * the categories. Safe to use outside a queue page (e.g. the encounter page).
+ */
+function usePreferredServicePointCategoryIds() {
+  const [preferredServicePointCategoryIds] = useAtom(atom);
+  return preferredServicePointCategoryIds;
+}
+
+export {
+  usePreferredServicePointCategory,
+  usePreferredServicePointCategoryIds,
+};
