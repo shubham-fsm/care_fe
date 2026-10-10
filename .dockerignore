@@ -4,3 +4,4 @@ build
 Dockerfile
 .git
 apps
+voice-agent

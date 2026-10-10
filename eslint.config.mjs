@@ -56,6 +56,8 @@ const config = [
       "**/*.css",
       "**/*.csv",
       "**/Dockerfile",
+      // Standalone Node service with its own tsconfig and package.json
+      "voice-agent/**",
     ],
   },
   eslint.configs.recommended,

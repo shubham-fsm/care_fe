@@ -47,6 +47,7 @@ interface ImportMetaEnv {
   readonly REACT_DECIMAL_ROUNDING_METHOD?: string;
   readonly REACT_MAX_FORM_DIALOG_FAVORITES?: string;
   readonly REACT_MEDICATION_VALUE_SET_SELECT_DEFAULT_TAB?: string;
+  readonly REACT_VOICE_AGENT_URL?: string;
 
   // Plugins related envs...
   readonly REACT_SENTRY_DSN?: string;
