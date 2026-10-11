@@ -111,7 +111,6 @@ const envSchema = z
     REACT_CUSTOM_DESCRIPTION: z.string().optional(),
     REACT_CUSTOM_LOGO_ALT: logoSchemaString.optional(),
     REACT_MAPS_FALLBACK_URL_TEMPLATE: z.string().url().optional(),
-    REACT_VOICE_AGENT_URL: z.string().url().optional(),
     REACT_ENABLED_APPS: z.string().optional(),
     REACT_RECAPTCHA_SITE_KEY: z.string(),
     REACT_APP_MAX_IMAGE_UPLOAD_SIZE_MB: numberAsString.optional(),

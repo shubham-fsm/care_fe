@@ -407,12 +407,6 @@ const careConfig = {
   maxFormDialogFavorites: env.REACT_MAX_FORM_DIALOG_FAVORITES
     ? parseInt(env.REACT_MAX_FORM_DIALOG_FAVORITES, 10)
     : 5,
-
-  /**
-   * URL of the CARE voice support agent (see `voice-agent/`).
-   * The assistant button is hidden when this is not set.
-   */
-  voiceAgentUrl: env.REACT_VOICE_AGENT_URL || "",
 } as const;
 
 export default careConfig;

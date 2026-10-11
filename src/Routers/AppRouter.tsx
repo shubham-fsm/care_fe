@@ -10,7 +10,6 @@ import ErrorBoundary from "@/components/Common/ErrorBoundary";
 import BrowserWarning from "@/components/ErrorPages/BrowserWarning";
 import ErrorPage from "@/components/ErrorPages/DefaultErrorPage";
 import SessionExpired from "@/components/ErrorPages/SessionExpired";
-import { VoiceAgent } from "@/components/VoiceAgent/VoiceAgent";
 
 import useAuthUser from "@/hooks/useAuthUser";
 import { useOrganizationRoutes, usePluginRoutes } from "@/hooks/useCareApps";
@@ -155,7 +154,6 @@ export default function AppRouter() {
             onOpenChange={setCommandDialogOpen}
           />
           <BrowserWarning />
-          <VoiceAgent />
           <div className="relative z-10 flex h-16 bg-white shadow-sm shrink-0 md:hidden">
             <div className="flex items-center">
               {shouldShowSidebar && <SidebarTrigger />}
