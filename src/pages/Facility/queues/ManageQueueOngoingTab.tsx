@@ -31,6 +31,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { CallNextAndStartConsultationButton } from "@/pages/Facility/queues/CallNextAndStartConsultationButton";
 import { OngoingQueueTokenCardsList } from "@/pages/Facility/queues/OngoingQueueTokenCard";
 import { usePreferredServicePointCategory } from "@/pages/Facility/queues/usePreferredServicePointCategory";
 import { getTokenQueueStatusCount } from "@/pages/Facility/queues/utils";
@@ -48,6 +49,7 @@ import {
   SearchIcon,
   SettingsIcon,
   SlidersHorizontalIcon,
+  Stethoscope,
 } from "lucide-react";
 import { useQueryParams } from "raviger";
 import { useState } from "react";
@@ -247,6 +249,16 @@ export function ManageQueueOngoingTab({ facilityId, queueId }: Props) {
                               <span className="text-sm font-semibold text-gray-700 text-center">
                                 {t("no_patient_is_being_served")}
                               </span>
+                              <CallNextAndStartConsultationButton
+                                subQueueId={subQueue.id}
+                                facilityId={facilityId}
+                                queueId={queueId}
+                                variant="primary"
+                                size="lg"
+                              >
+                                <Stethoscope />
+                                {t("call_next_and_start_consultation")}
+                              </CallNextAndStartConsultationButton>
                               <CallNextPatientButton
                                 subQueueId={subQueue.id}
                                 facilityId={facilityId}
@@ -413,6 +425,24 @@ function InServiceColumnOptions({
 
   return (
     <div className="flex gap-1">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          {/* The button also renders a dialog, so the trigger needs a wrapper. */}
+          <span className="inline-flex">
+            <CallNextAndStartConsultationButton
+              subQueueId={subQueueId}
+              facilityId={facilityId}
+              queueId={queueId}
+              variant="ghost"
+              size="icon"
+              aria-label={t("call_next_and_start_consultation")}
+            >
+              <Stethoscope />
+            </CallNextAndStartConsultationButton>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>{t("call_next_and_start_consultation")}</TooltipContent>
+      </Tooltip>
       <Tooltip>
         <TooltipTrigger asChild>
           <CallNextPatientButton
