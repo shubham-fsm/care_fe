@@ -12,7 +12,7 @@ import {
   PatientDeceasedInfo,
   PatientHeader,
 } from "@/components/Patient/PatientHeader";
-import { FormVitalsPanel } from "@/components/Patient/vitals/FormVitalsPanel";
+import { LatestVitalsStrip } from "@/components/Patient/vitals/LatestVitalsStrip";
 import encounterApi from "@/types/emr/encounter/encounterApi";
 
 interface Props {
@@ -58,41 +58,38 @@ export default function EncounterQuestionnaire({
             <PatientDeceasedInfo patient={encounter.patient} />
           </div>
         )}
-        <div className="flex flex-col-reverse lg:flex-row gap-4 items-stretch lg:items-start">
-          <Card className="mt-2 flex-1 min-w-0">
-            <CardContent className="lg:p-4 p-0">
-              <QuestionnaireForm
-                facilityId={facilityId}
-                patientId={patientId}
-                subjectType={subjectType}
-                encounterId={encounterId}
-                questionnaireSlug={questionnaireSlug}
-                onSubmit={() => {
-                  if (encounterId && facilityId) {
-                    navigate(
-                      `/facility/${facilityId}/patient/${patientId}/encounter/${encounterId}/updates`,
-                    );
-                  } else if (facilityId) {
-                    navigate(
-                      `/facility/${facilityId}/patient/${patientId}/updates`,
-                    );
-                  } else {
-                    navigate(`/patient/${patientId}/updates`);
-                  }
-                }}
-              />
-            </CardContent>
-          </Card>
-          {encounterId && (
-            <aside className="lg:w-96 xl:w-[30rem] shrink-0 lg:sticky lg:top-4 lg:mt-2 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
-              <FormVitalsPanel
-                patientId={patientId}
-                encounterId={encounterId}
-                className="border border-gray-200 shadow-sm"
-              />
-            </aside>
-          )}
-        </div>
+        {encounter && encounterId && (
+          <LatestVitalsStrip
+            patient={encounter.patient}
+            patientId={patientId}
+            encounterId={encounterId}
+            className="sticky top-0 z-10"
+          />
+        )}
+        <Card className="mt-2">
+          <CardContent className="lg:p-4 p-0">
+            <QuestionnaireForm
+              facilityId={facilityId}
+              patientId={patientId}
+              subjectType={subjectType}
+              encounterId={encounterId}
+              questionnaireSlug={questionnaireSlug}
+              onSubmit={() => {
+                if (encounterId && facilityId) {
+                  navigate(
+                    `/facility/${facilityId}/patient/${patientId}/encounter/${encounterId}/updates`,
+                  );
+                } else if (facilityId) {
+                  navigate(
+                    `/facility/${facilityId}/patient/${patientId}/updates`,
+                  );
+                } else {
+                  navigate(`/patient/${patientId}/updates`);
+                }
+              }}
+            />
+          </CardContent>
+        </Card>
       </div>
     </Page>
   );
