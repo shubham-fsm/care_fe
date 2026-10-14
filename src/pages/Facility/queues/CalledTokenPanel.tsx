@@ -1,7 +1,14 @@
+import careConfig from "@careConfig";
+
 import CreateEncounterForm from "@/components/Encounter/CreateEncounterForm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { EncounterStatus } from "@/types/emr/encounter/encounter";
+import {
+  EncounterRead,
+  EncounterStatus,
+} from "@/types/emr/encounter/encounter";
+import encounterApi from "@/types/emr/encounter/encounterApi";
+import facilityOrganizationApi from "@/types/facilityOrganization/facilityOrganizationApi";
 import { AppointmentStatus } from "@/types/scheduling/schedule";
 import scheduleApi from "@/types/scheduling/scheduleApi";
 import {
@@ -187,19 +194,11 @@ function StartConsultationAction({
 
   if (token.patient && token.booking) {
     return (
-      <CreateEncounterForm
-        patientId={token.patient.id}
+      <QuickStartConsultation
         facilityId={facilityId}
-        patientName={token.patient.name}
-        appointment={token.booking.id}
-        defaultOpen={false}
-        defaultStatus={EncounterStatus.IN_PROGRESS}
-        onSuccess={onStart}
-        trigger={
-          <Button variant="primary" size="lg" className="sm:flex-1">
-            {label}
-          </Button>
-        }
+        token={token}
+        onStart={onStart}
+        label={label}
       />
     );
   }
@@ -214,6 +213,106 @@ function StartConsultationAction({
         <Megaphone />
         {t("open_token")}
       </Link>
+    </Button>
+  );
+}
+
+const ENCOUNTER_DEPARTMENTS_FAVORITE_LIST = "encounter_departments";
+
+// Queue visits are outpatient visits unless the deployment sets a default.
+const QUEUE_ENCOUNTER_CLASS =
+  careConfig.defaultEncounterType ??
+  (careConfig.encounterClasses.includes("amb")
+    ? "amb"
+    : careConfig.encounterClasses[0]);
+
+/**
+ * One tap: creates the in-progress encounter for the called patient with the
+ * doctor's starred encounter departments and opens it. Without starred
+ * departments, the usual encounter form opens once; starring a department
+ * there makes the next start one tap.
+ */
+function QuickStartConsultation({
+  facilityId,
+  token,
+  onStart,
+  label,
+}: {
+  facilityId: string;
+  token: TokenRetrieve;
+  onStart: () => void;
+  label: React.ReactNode;
+}) {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const patient = token.patient!;
+  const booking = token.booking!;
+
+  const { data: preferredDepartments, isLoading } = useQuery({
+    queryKey: [
+      "facilityOrganization-favorites",
+      facilityId,
+      ENCOUNTER_DEPARTMENTS_FAVORITE_LIST,
+    ],
+    queryFn: query(facilityOrganizationApi.list, {
+      pathParams: { facilityId },
+      queryParams: { favorite_list: ENCOUNTER_DEPARTMENTS_FAVORITE_LIST },
+    }),
+  });
+
+  const { mutate: createEncounter, isPending } = useMutation({
+    mutationFn: mutate(encounterApi.create),
+    onSuccess: (encounter: EncounterRead) => {
+      toast.success(t("encounter_created"));
+      queryClient.invalidateQueries({ queryKey: ["encounters", patient.id] });
+      onStart();
+      navigate(
+        `/facility/${facilityId}/patient/${patient.id}/encounter/${encounter.id}/updates`,
+      );
+    },
+  });
+
+  const departments = preferredDepartments?.results.map(({ id }) => id) ?? [];
+
+  if (!isLoading && departments.length === 0) {
+    return (
+      <CreateEncounterForm
+        patientId={patient.id}
+        facilityId={facilityId}
+        patientName={patient.name}
+        appointment={booking.id}
+        defaultStatus={EncounterStatus.IN_PROGRESS}
+        onSuccess={onStart}
+        trigger={
+          <Button variant="primary" size="lg" className="sm:flex-1">
+            {label}
+          </Button>
+        }
+      />
+    );
+  }
+
+  return (
+    <Button
+      variant="primary"
+      size="lg"
+      className="sm:flex-1"
+      disabled={isLoading || isPending}
+      onClick={() =>
+        createEncounter({
+          patient: patient.id,
+          facility: facilityId,
+          status: EncounterStatus.IN_PROGRESS,
+          encounter_class: QUEUE_ENCOUNTER_CLASS,
+          priority: "routine",
+          organizations: departments,
+          period: { start: new Date().toISOString() },
+          appointment: booking.id,
+          tags: [],
+        })
+      }
+    >
+      {label}
     </Button>
   );
 }
