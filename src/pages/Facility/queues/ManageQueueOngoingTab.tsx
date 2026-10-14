@@ -37,9 +37,8 @@ import { getTokenQueueStatusCount } from "@/pages/Facility/queues/utils";
 import { TokenRead, TokenStatus } from "@/types/tokens/token/token";
 import tokenCategoryApi from "@/types/tokens/tokenCategory/tokenCategoryApi";
 import tokenQueueApi from "@/types/tokens/tokenQueue/tokenQueueApi";
-import mutate from "@/Utils/request/mutate";
 import query from "@/Utils/request/query";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   ChevronDownIcon,
   DoorOpenIcon,
@@ -52,7 +51,9 @@ import {
 import { useQueryParams } from "raviger";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { CalledTokenPanel } from "./CalledTokenPanel";
 import { ServicePointsDropDown } from "./ServicePointsDropDown";
+import { useCallNextToken } from "./useCallNextToken";
 import { useQueueServicePoints } from "./useQueueServicePoints";
 
 interface Props {
@@ -67,7 +68,7 @@ export function ManageQueueOngoingTab({ facilityId, queueId }: Props) {
     facilityId,
   });
   const [qParams, setQueryParams] = useQueryParams();
-  const { autoRefresh, search, patient, patient_name } = qParams;
+  const { autoRefresh, search, patient, patient_name, called_token } = qParams;
   const [mobileSection, setMobileSection] = useState<"waiting" | "serving">(
     "waiting",
   );
@@ -83,6 +84,16 @@ export function ManageQueueOngoingTab({ facilityId, queueId }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
+      {called_token && (
+        <CalledTokenPanel
+          facilityId={facilityId}
+          queueId={queueId}
+          tokenId={called_token}
+          onDismiss={() =>
+            setQueryParams({ ...qParams, called_token: undefined })
+          }
+        />
+      )}
       {/* Mobile/tablet: collapsible filter trigger */}
       <Collapsible
         open={filtersOpen}
@@ -527,39 +538,13 @@ function CallNextPatientButton({
   facilityId: string;
   queueId: string;
 } & React.ComponentProps<typeof Button>) {
-  const { preferredServicePointCategories } = usePreferredServicePointCategory({
-    facilityId,
-  });
-
-  const queryClient = useQueryClient();
-
-  const {
-    mutate: setNextTokenToSubQueue,
-    isPending: isSettingNextTokenToSubQueue,
-  } = useMutation({
-    mutationFn: mutate(tokenQueueApi.setNextTokenToSubQueue, {
-      pathParams: { facility_id: facilityId, id: queueId },
-    }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["infinite-tokens", facilityId, queueId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["token-queue-summary", facilityId, queueId],
-      });
-    },
-  });
+  const { callNext, isPending } = useCallNextToken({ facilityId, queueId });
 
   return (
     <Button
       {...props}
-      disabled={isSettingNextTokenToSubQueue}
-      onClick={() => {
-        setNextTokenToSubQueue({
-          sub_queue: subQueueId,
-          category: preferredServicePointCategories?.[subQueueId]?.id,
-        });
-      }}
+      disabled={isPending}
+      onClick={() => callNext(subQueueId)}
     />
   );
 }

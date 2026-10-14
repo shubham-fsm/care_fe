@@ -23,9 +23,13 @@ import {
   encounterRequiresDischarge,
   useEncounterProgressController,
 } from "@/pages/Encounters/utils/useEncounterProgressController";
+import { useCallNextToken } from "@/pages/Facility/queues/useCallNextToken";
 import patientApi from "@/types/emr/patient/patientApi";
 import scheduleApi from "@/types/scheduling/scheduleApi";
-import { renderTokenNumber } from "@/types/tokens/token/token";
+import {
+  renderTokenNumber,
+  TokenActiveStatuses,
+} from "@/types/tokens/token/token";
 import mutate from "@/Utils/request/mutate";
 import query from "@/Utils/request/query";
 import { dateQueryString } from "@/Utils/utils";
@@ -38,6 +42,7 @@ import {
   CheckCircle,
   ExternalLinkIcon,
   ListOrdered,
+  Megaphone,
   ScanLine,
 } from "lucide-react";
 import { Link, navigate } from "raviger";
@@ -204,6 +209,42 @@ const AppointmentEncounterHeaderActions = ({
       encounter,
     });
 
+  const token = appointment.token;
+  const canCompleteAndCallNext =
+    !requiresDischarge &&
+    encounter.status !== EncounterStatus.COMPLETED &&
+    !!token?.sub_queue &&
+    TokenActiveStatuses.includes(token.status);
+
+  const { callNext, isPending: isCallingNext } = useCallNextToken({
+    facilityId: encounter.facility.id,
+    queueId: token?.queue.id ?? "",
+    silent: true,
+  });
+
+  const handleCompleteAndCallNext = () => {
+    if (!token?.sub_queue) return;
+    const subQueueId = token.sub_queue.id;
+    const queuePath = `/facility/${encounter.facility.id}/${resourceTypeToResourcePathSlug[appointment.resource_type]}/${appointment.resource.id}/queues/${token.queue.id}/ongoing`;
+    completeEverything({
+      onSuccess: () =>
+        callNext(subQueueId, {
+          onSuccess: (nextToken) => {
+            toast.success(
+              t("token_called_to_service_point", {
+                token: renderTokenNumber(nextToken),
+              }),
+            );
+            navigate(`${queuePath}?called_token=${nextToken.id}`);
+          },
+          onError: () => {
+            toast.info(t("no_patient_waiting_to_call"));
+            navigate(queuePath);
+          },
+        }),
+    });
+  };
+
   const { mutate: startEncounter } = useMutation({
     mutationFn: mutate(encounterApi.update, {
       pathParams: { id: encounter.id },
@@ -261,11 +302,22 @@ const AppointmentEncounterHeaderActions = ({
           </span>
         )}
       </span>
+      {canCompleteAndCallNext && (
+        <Button
+          variant="primary"
+          className="w-full sm:w-auto"
+          disabled={isPending || isCallingNext}
+          onClick={handleCompleteAndCallNext}
+        >
+          <Megaphone />
+          {t("complete_and_call_next")}
+        </Button>
+      )}
       <Button
         variant="outline"
         className="w-full sm:w-auto"
-        disabled={isPending}
-        onClick={completeEverything}
+        disabled={isPending || isCallingNext}
+        onClick={() => completeEverything()}
       >
         <CheckCircle />
         {requiresDischarge ? t("mark_for_discharge") : t("complete")}
@@ -297,7 +349,7 @@ const AppointmentEncounterHeaderActions = ({
             <DropdownMenuItem
               className="p-2.5"
               onClick={() => completeEverything()}
-              disabled={isPending}
+              disabled={isPending || isCallingNext}
             >
               <div className="flex flex-col items-start">
                 <span className="text-sm font-medium text-black">
