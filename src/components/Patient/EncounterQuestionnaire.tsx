@@ -60,7 +60,6 @@ export default function EncounterQuestionnaire({
         )}
         {encounter && encounterId && (
           <LatestVitalsStrip
-            patient={encounter.patient}
             patientId={patientId}
             encounterId={encounterId}
             className="sticky top-0 z-10"

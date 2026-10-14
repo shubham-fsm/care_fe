@@ -15,9 +15,8 @@ import {
   ObservationPlotConfig,
 } from "@/types/emr/observation/observation";
 import observationApi from "@/types/emr/observation/observationApi";
-import { PatientRead } from "@/types/emr/patient/patient";
 import query from "@/Utils/request/query";
-import { formatName, formatPatientAge } from "@/Utils/utils";
+import { formatName } from "@/Utils/utils";
 
 const CODES = {
   systolic: ["8480-6"],
@@ -91,20 +90,17 @@ function pickLatest(observations: ObservationListRead[]) {
 const isToday = (iso: string) => dayjs(iso).isSame(dayjs(), "day");
 
 interface Props {
-  patient: PatientRead;
   patientId: string;
   encounterId: string;
   className?: string;
 }
 
 /**
- * A compact, always-visible line with the patient's age/sex and the latest
- * vitals of the visit, shown above a form so the doctor does not have to go
+ * A compact, always-visible line with the latest vitals of the visit, shown above a form so the doctor does not have to go
  * back to the overview while filling it. Falls back to vitals recorded today
  * in another encounter (e.g. at the nursing station).
  */
 export function LatestVitalsStrip({
-  patient,
   patientId,
   encounterId,
   className,
@@ -207,9 +203,7 @@ export function LatestVitalsStrip({
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-3 py-2">
         <div className="flex items-center gap-2 pr-4 sm:border-r border-gray-200">
           <HeartPulse className="size-4 text-primary-700" />
-          <span className="text-sm font-semibold">
-            {formatPatientAge(patient, true)}, {t(`GENDER__${patient.gender}`)}
-          </span>
+          <span className="text-sm font-semibold">{t("vitals")}</span>
         </div>
         {isLoading ? (
           <span className="text-sm text-gray-500">{t("loading")}</span>
