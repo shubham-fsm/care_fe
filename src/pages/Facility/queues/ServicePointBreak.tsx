@@ -4,11 +4,6 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 import { useScheduleResourceFromPath } from "@/components/Schedule/useScheduleResource";
 import { TokenStatus } from "@/types/tokens/token/token";
@@ -103,20 +98,16 @@ export function GoOnBreakButton({
   const { mutate, isPending } = useServicePointBreak(facilityId, queueId);
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={t("go_on_break")}
-          disabled={isPending}
-          onClick={() => mutate({ servicePoint, onBreak: true })}
-        >
-          <Coffee />
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent>{t("go_on_break")}</TooltipContent>
-    </Tooltip>
+    <Button
+      variant="outline"
+      size="sm"
+      className="border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
+      disabled={isPending}
+      onClick={() => mutate({ servicePoint, onBreak: true })}
+    >
+      <Coffee />
+      {t("break")}
+    </Button>
   );
 }
 

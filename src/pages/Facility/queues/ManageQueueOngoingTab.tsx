@@ -429,7 +429,7 @@ function InServiceColumnOptions({
   });
 
   return (
-    <div className="flex gap-1">
+    <div className="flex items-center gap-1">
       <GoOnBreakButton
         facilityId={facilityId}
         queueId={queueId}
