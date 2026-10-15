@@ -37,6 +37,7 @@ import { getTokenQueueStatusCount } from "@/pages/Facility/queues/utils";
 import { TokenRead, TokenStatus } from "@/types/tokens/token/token";
 import tokenCategoryApi from "@/types/tokens/tokenCategory/tokenCategoryApi";
 import tokenQueueApi from "@/types/tokens/tokenQueue/tokenQueueApi";
+import { TokenSubQueueRead } from "@/types/tokens/tokenSubQueue/tokenSubQueue";
 import query from "@/Utils/request/query";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -52,6 +53,7 @@ import { useQueryParams } from "raviger";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CalledTokenPanel } from "./CalledTokenPanel";
+import { GoOnBreakButton, ServicePointsOnBreak } from "./ServicePointBreak";
 import { ServicePointsDropDown } from "./ServicePointsDropDown";
 import { useCallNextToken } from "./useCallNextToken";
 import { useQueueServicePoints } from "./useQueueServicePoints";
@@ -216,6 +218,7 @@ export function ManageQueueOngoingTab({ facilityId, queueId }: Props) {
             }
           >
             <div className="flex flex-col gap-4">
+              <ServicePointsOnBreak facilityId={facilityId} queueId={queueId} />
               {assignedServicePoints.map((subQueue, index) => (
                 <div key={subQueue.id} className="flex flex-col gap-4">
                   {index > 0 && (
@@ -237,6 +240,7 @@ export function ManageQueueOngoingTab({ facilityId, queueId }: Props) {
                         facilityId={facilityId}
                         queueId={queueId}
                         subQueueId={subQueue.id}
+                        servicePoint={subQueue}
                         tokens={[]}
                       />
                     </div>
@@ -400,10 +404,12 @@ function InServiceColumnOptions({
   facilityId,
   queueId,
   subQueueId,
+  servicePoint,
 }: {
   facilityId: string;
   queueId: string;
   subQueueId: string;
+  servicePoint: TokenSubQueueRead;
   tokens: TokenRead[];
 }) {
   const { t } = useTranslation();
@@ -424,6 +430,11 @@ function InServiceColumnOptions({
 
   return (
     <div className="flex gap-1">
+      <GoOnBreakButton
+        facilityId={facilityId}
+        queueId={queueId}
+        servicePoint={servicePoint}
+      />
       <Tooltip>
         <TooltipTrigger asChild>
           <CallNextPatientButton
