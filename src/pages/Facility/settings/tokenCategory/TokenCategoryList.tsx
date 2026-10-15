@@ -33,7 +33,10 @@ import { getPermissions } from "@/common/Permissions";
 import { usePermissions } from "@/context/PermissionContext";
 import useCurrentFacility from "@/pages/Facility/utils/useCurrentFacility";
 import { SCHEDULABLE_RESOURCE_TYPE_COLORS } from "@/types/scheduling/schedule";
-import { TokenCategoryRead } from "@/types/tokens/tokenCategory/tokenCategory";
+import {
+  callPriorityOf,
+  TokenCategoryRead,
+} from "@/types/tokens/tokenCategory/tokenCategory";
 import tokenCategoryApi from "@/types/tokens/tokenCategory/tokenCategoryApi";
 
 function TokenCategoryCard({
@@ -57,6 +60,7 @@ function TokenCategoryCard({
               >
                 {t(tokenCategory.resource_type)}
               </Badge>
+              <CallPriorityBadge tokenCategory={tokenCategory} />
             </div>
             <h3 className="font-medium text-gray-900 text-lg">
               {t("name")}: {tokenCategory.name}
@@ -221,6 +225,10 @@ export default function TokenCategoryList({
                           {tokenCategory.default && (
                             <Badge className="ml-2">{t("default")}</Badge>
                           )}
+                          <CallPriorityBadge
+                            tokenCategory={tokenCategory}
+                            className="ml-2"
+                          />
                         </TableCell>
                         <TableCell>
                           <Badge
@@ -283,5 +291,27 @@ function TokenCategoryActions({
       }
       viewPath={`/facility/${facilityId}/settings/token_category/${tokenCategory.id}`}
     />
+  );
+}
+
+function CallPriorityBadge({
+  tokenCategory,
+  className,
+}: {
+  tokenCategory: TokenCategoryRead;
+  className?: string;
+}) {
+  const { t } = useTranslation();
+  const priority = callPriorityOf(tokenCategory);
+  if (priority === "normal") {
+    return null;
+  }
+  return (
+    <Badge
+      variant={priority === "emergency" ? "danger" : "yellow"}
+      className={className}
+    >
+      {t(priority === "emergency" ? "emergency" : "call_priority_high_short")}
+    </Badge>
   );
 }

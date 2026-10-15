@@ -5,6 +5,10 @@ import {
   TokenStatus,
 } from "@/types/tokens/token/token";
 import tokenApi from "@/types/tokens/token/tokenApi";
+import {
+  CallPriority,
+  callPriorityOf,
+} from "@/types/tokens/tokenCategory/tokenCategory";
 import { callApi } from "@/Utils/request/query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -15,24 +19,15 @@ type CallNextResult =
   | { kind: "already_called"; token: TokenRead }
   | { kind: "none_waiting" };
 
-const EMERGENCY_CATEGORY = /emergency|urgent|आपात/i;
-const PRIORITY_CATEGORY =
-  /senior|elderly|pregnan|priority|vip|divyang|disab|वरिष्ठ|गर्भवती/i;
+const RANK: Record<CallPriority, number> = {
+  emergency: 0,
+  high: 1,
+  normal: 2,
+};
 
-/**
- * Call order of a token's category: 0 emergency, 1 other priority groups
- * (senior citizens, pregnant women, divyang, VIP), 2 everyone else. A
- * category can also be marked with `metadata.priority` = "emergency" | true.
- */
+/** Call order of a token's category: emergency, then high, then normal. */
 export function categoryRank(category: TokenRead["category"]) {
-  const flag = category.metadata?.priority;
-  if (flag === "emergency" || EMERGENCY_CATEGORY.test(category.name)) {
-    return 0;
-  }
-  if (flag === true || PRIORITY_CATEGORY.test(category.name)) {
-    return 1;
-  }
-  return 2;
+  return RANK[callPriorityOf(category)];
 }
 
 /** Highest-priority waiting token; oldest first within the same priority. */

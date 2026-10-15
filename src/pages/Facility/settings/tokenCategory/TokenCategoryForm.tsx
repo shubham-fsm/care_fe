@@ -36,6 +36,8 @@ import {
   SchedulableResourceType,
 } from "@/types/scheduling/schedule";
 import {
+  CallPriority,
+  callPriorityOf,
   TokenCategoryCreate,
   TokenCategoryRead,
   TokenCategoryUpdate,
@@ -140,6 +142,7 @@ export function TokenCategoryFormContent({
       .trim()
       .min(1, t("field_required"))
       .max(5, t("maximum_characters_allowed", { count: 5 })),
+    priority: z.enum(["normal", "high", "emergency"]),
   });
 
   const form = useForm({
@@ -150,11 +153,13 @@ export function TokenCategoryFormContent({
             name: existingData.name,
             resource_type: existingData.resource_type,
             shorthand: existingData.shorthand,
+            priority: callPriorityOf(existingData),
           }
         : {
             name: "",
             resource_type: SchedulableResourceType.Practitioner,
             shorthand: "",
+            priority: "normal" as const,
           },
   });
 
@@ -194,6 +199,7 @@ export function TokenCategoryFormContent({
         name: data.name,
         resource_type: data.resource_type,
         shorthand: data.shorthand,
+        metadata: withPriority(existingData?.metadata, data.priority),
       };
       updateTokenCategory(updatePayload);
     } else {
@@ -201,6 +207,7 @@ export function TokenCategoryFormContent({
         name: data.name,
         resource_type: data.resource_type,
         shorthand: data.shorthand,
+        metadata: withPriority(undefined, data.priority),
       };
       createTokenCategory(createPayload);
     }
@@ -289,6 +296,37 @@ export function TokenCategoryFormContent({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="priority"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("call_priority")}</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="emergency">
+                        {t("call_priority__emergency")}
+                      </SelectItem>
+                      <SelectItem value="high">
+                        {t("call_priority__high")}
+                      </SelectItem>
+                      <SelectItem value="normal">
+                        {t("call_priority__normal")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    {t("call_priority_description")}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
         </div>
 
@@ -305,4 +343,14 @@ export function TokenCategoryFormContent({
       </form>
     </Form>
   );
+}
+
+function withPriority(
+  metadata: Record<string, unknown> | null | undefined,
+  priority: CallPriority,
+) {
+  return {
+    ...(metadata ?? {}),
+    priority: priority === "high" ? true : priority,
+  };
 }
