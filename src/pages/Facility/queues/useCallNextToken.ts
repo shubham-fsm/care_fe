@@ -1,10 +1,19 @@
 import { usePreferredServicePointCategoryIds } from "@/pages/Facility/queues/usePreferredServicePointCategory";
-import { TokenRead, TokenStatus } from "@/types/tokens/token/token";
+import {
+  renderTokenNumber,
+  TokenRead,
+  TokenStatus,
+} from "@/types/tokens/token/token";
 import tokenApi from "@/types/tokens/token/tokenApi";
 import { callApi } from "@/Utils/request/query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
-class NoTokenWaitingError extends Error {}
+type CallNextResult =
+  | { kind: "called"; token: TokenRead }
+  | { kind: "already_called"; token: TokenRead }
+  | { kind: "none_waiting" };
 
 /**
  * Calls the next waiting token of a queue to a service point (sub queue),
@@ -22,11 +31,25 @@ export function useCallNextToken({
   queueId: string;
   silent?: boolean;
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const preferredCategoryIds = usePreferredServicePointCategoryIds();
 
   const mutation = useMutation({
-    mutationFn: async (subQueueId: string): Promise<TokenRead> => {
+    mutationFn: async (subQueueId: string): Promise<CallNextResult> => {
+      // Do not call a second patient to a room that already has one called
+      // (e.g. Serve Next pressed twice): the TV would announce both.
+      const { results: alreadyCalled } = await callApi(tokenApi.list, {
+        pathParams: { facility_id: facilityId, queue_id: queueId },
+        queryParams: {
+          status: TokenStatus.CREATED,
+          sub_queue: subQueueId,
+          limit: 1,
+        },
+      });
+      if (alreadyCalled[0]) {
+        return { kind: "already_called", token: alreadyCalled[0] };
+      }
       const category = preferredCategoryIds[subQueueId];
       const { results } = await callApi(tokenApi.list, {
         pathParams: { facility_id: facilityId, queue_id: queueId },
@@ -40,9 +63,9 @@ export function useCallNextToken({
       });
       const next = results[0];
       if (!next) {
-        throw new NoTokenWaitingError();
+        return { kind: "none_waiting" };
       }
-      return callApi(tokenApi.update, {
+      const token = await callApi(tokenApi.update, {
         pathParams: { facility_id: facilityId, queue_id: queueId, id: next.id },
         body: {
           status: TokenStatus.CREATED,
@@ -50,6 +73,7 @@ export function useCallNextToken({
           sub_queue: subQueueId,
         },
       });
+      return { kind: "called", token };
     },
     onSettled: () => {
       queryClient.invalidateQueries({
@@ -73,7 +97,27 @@ export function useCallNextToken({
   ) =>
     mutation
       .mutateAsync(subQueueId)
-      .then((token) => options?.onSuccess?.(token))
+      .then((result) => {
+        if (result.kind === "called") {
+          options?.onSuccess?.(result.token);
+        } else if (result.kind === "already_called") {
+          if (options?.onSuccess) {
+            // e.g. Complete & Call Next: open the queue on the patient
+            // already called to this room.
+            options.onSuccess(result.token);
+          } else {
+            toast.info(
+              t("token_already_called_to_service_point", {
+                token: renderTokenNumber(result.token),
+              }),
+            );
+          }
+        } else if (options?.onError) {
+          options.onError();
+        } else {
+          toast.info(t("no_patient_is_waiting"));
+        }
+      })
       .catch(() => options?.onError?.());
 
   return { callNext, isPending: mutation.isPending };

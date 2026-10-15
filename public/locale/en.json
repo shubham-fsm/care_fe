@@ -6274,6 +6274,7 @@
   "toggle_filters": "Toggle Filters",
   "toggle_sidebar": "Toggle Sidebar",
   "token": "Token",
+  "token_already_called_to_service_point": "{{token}} is already called to this room. Start their consultation, or send them back to waiting first.",
   "token_assigned_to_service_point": "Token has been assigned to service point",
   "token_booking": "Token Booking",
   "token_called_to_service_point": "Visit completed. {{token}} has been called.",
