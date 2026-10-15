@@ -1,4 +1,5 @@
 import ConfirmActionDialog from "@/components/Common/ConfirmActionDialog";
+import { useScheduleResourceFromPath } from "@/components/Schedule/useScheduleResource";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -330,6 +331,26 @@ function OngoingQueueTokenCardInner({
     onEnteredInErrorClick: () => setShowEnteredInErrorDialog(true),
   });
 
+  // "Encounter" on a patient who is not in a room yet (waiting, or missed and
+  // back at the door): the doctor is seeing them now, in their room. Pass the
+  // room so the patient shows as "In consultation" there (and on the TV).
+  const { assignedServicePoints } = useQueueServicePoints();
+  const { resourceType, resourceId } = useScheduleResourceFromPath();
+  const notInRoom =
+    !token.sub_queue &&
+    [TokenStatus.CREATED, TokenStatus.UNFULFILLED].includes(token.status);
+  const encounterPath = `/facility/${facilityId}/queue/${token.queue.id}/token/${token.id}`;
+  const encounterHref = notInRoom
+    ? `${encounterPath}?${new URLSearchParams({
+        start_service: "1",
+        resource_type: resourceType,
+        resource_id: resourceId,
+        ...(assignedServicePoints.length === 1
+          ? { room: assignedServicePoints[0].id }
+          : {}),
+      }).toString()}`
+    : encounterPath;
+
   const renderItem = (
     item: TokenActionItem,
     Item: typeof ContextMenuItem | typeof DropdownMenuItem,
@@ -387,10 +408,7 @@ function OngoingQueueTokenCardInner({
           </div>
           <div className="flex w-full md:w-auto items-center flex-wrap gap-2 md:gap-3">
             <Button variant="outline" asChild size="sm">
-              <Link
-                basePath="/"
-                href={`/facility/${facilityId}/queue/${token.queue.id}/token/${token.id}`}
-              >
+              <Link basePath="/" href={encounterHref}>
                 {t("encounter")}
               </Link>
             </Button>
