@@ -28,6 +28,7 @@ import {
 } from "@/types/tokens/token/token";
 import tokenApi from "@/types/tokens/token/tokenApi";
 import mutate from "@/Utils/request/mutate";
+import { callApi } from "@/Utils/request/query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   BringToFront,
@@ -93,7 +94,47 @@ function useTokenActions({
     },
   });
 
+  // A room shows one called patient on the TV. Calling a second one would
+  // hide the first, who is still waiting at the door.
+  const callToRoom = async (roomId: string, roomName: string) => {
+    const { results } = await callApi(tokenApi.list, {
+      pathParams: { facility_id: facilityId, queue_id: token.queue.id },
+      queryParams: { status: TokenStatus.CREATED, sub_queue: roomId, limit: 5 },
+    });
+    const other = results.find((called) => called.id !== token.id);
+    if (other) {
+      toast.error(
+        t("room_already_has_called_patient", {
+          token: renderTokenNumber(other),
+          room: roomName,
+        }),
+      );
+      return;
+    }
+    updateToken({
+      status: TokenStatus.CREATED,
+      note: token.note,
+      sub_queue: roomId,
+    });
+  };
+
   const items: TokenActionItem[] = [];
+
+  if (token.status === TokenStatus.UNFULFILLED) {
+    // A missed patient who came back: they get their turn back (the waiting
+    // list is in order of arrival), without disturbing a called patient.
+    items.push({
+      key: "back_to_waiting_keep_turn",
+      label: t("back_to_waiting_keep_turn"),
+      icon: <RotateCcw className="size-4 mr-2" />,
+      onSelect: () =>
+        updateToken({
+          status: TokenStatus.CREATED,
+          note: token.note,
+          sub_queue: null,
+        }),
+    });
+  }
 
   if (token.status === TokenStatus.CREATED && token.sub_queue) {
     items.push({
@@ -179,12 +220,7 @@ function useTokenActions({
       key: `call_to_${service.id}`,
       label: t("call_to", { name: service.name }),
       icon: <Megaphone className="size-4 mr-2" />,
-      onSelect: () =>
-        updateToken({
-          status: TokenStatus.CREATED,
-          note: token.note,
-          sub_queue: service.id,
-        }),
+      onSelect: () => callToRoom(service.id, service.name),
     });
   });
 

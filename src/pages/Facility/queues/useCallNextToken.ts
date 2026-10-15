@@ -17,7 +17,7 @@ import { toast } from "sonner";
 type CallNextResult =
   | { kind: "called"; token: TokenRead }
   | { kind: "already_called"; token: TokenRead }
-  | { kind: "none_waiting" };
+  | { kind: "none_waiting"; onlyCategory?: boolean };
 
 const RANK: Record<CallPriority, number> = {
   emergency: 0,
@@ -85,23 +85,48 @@ export function useCallNextToken({
           status: TokenStatus.CREATED,
           sub_queue_is_null: true,
           ordering: "created_date",
-          limit: 100,
+          limit: 200, // the API page size limit
           ...(category ? { category } : {}),
         },
       });
-      const next = pickNextToken(waiting);
-      if (!next) {
-        return { kind: "none_waiting" };
-      }
-      const token = await callApi(tokenApi.update, {
-        pathParams: { facility_id: facilityId, queue_id: queueId, id: next.id },
-        body: {
-          status: TokenStatus.CREATED,
-          note: next.note,
-          sub_queue: subQueueId,
-        },
+      const pathFor = (id: string) => ({
+        facility_id: facilityId,
+        queue_id: queueId,
+        id,
       });
-      return { kind: "called", token };
+      const skipped = new Set<string>();
+      // Two rooms can press Serve Next at the same moment: re-check the
+      // patient right before calling, and once more after, so a patient is
+      // never announced for two rooms. The room that loses takes the next.
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const next = pickNextToken(waiting.filter((t) => !skipped.has(t.id)));
+        if (!next) {
+          return { kind: "none_waiting", onlyCategory: !!category };
+        }
+        skipped.add(next.id);
+        const fresh = await callApi(tokenApi.get, {
+          pathParams: pathFor(next.id),
+        });
+        if (fresh.status !== TokenStatus.CREATED || fresh.sub_queue) {
+          continue;
+        }
+        const token = await callApi(tokenApi.update, {
+          pathParams: pathFor(next.id),
+          body: {
+            status: TokenStatus.CREATED,
+            note: fresh.note,
+            sub_queue: subQueueId,
+          },
+        });
+        await new Promise((resolve) => setTimeout(resolve, 400));
+        const after = await callApi(tokenApi.get, {
+          pathParams: pathFor(next.id),
+        });
+        if (after.sub_queue?.id === subQueueId) {
+          return { kind: "called", token };
+        }
+      }
+      return { kind: "none_waiting" };
     },
     onSettled: () => {
       queryClient.invalidateQueries({
@@ -143,7 +168,13 @@ export function useCallNextToken({
         } else if (options?.onError) {
           options.onError();
         } else {
-          toast.info(t("no_patient_is_waiting"));
+          toast.info(
+            t(
+              result.kind === "none_waiting" && result.onlyCategory
+                ? "no_patient_of_room_category_waiting"
+                : "no_patient_is_waiting",
+            ),
+          );
         }
       })
       .catch(() => options?.onError?.());
