@@ -6,7 +6,11 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 import { useScheduleResourceFromPath } from "@/components/Schedule/useScheduleResource";
-import { TokenStatus } from "@/types/tokens/token/token";
+import {
+  renderTokenNumber,
+  TokenRead,
+  TokenStatus,
+} from "@/types/tokens/token/token";
 import tokenApi from "@/types/tokens/token/tokenApi";
 import {
   TokenSubQueueRead,
@@ -16,10 +20,10 @@ import tokenSubQueueApi from "@/types/tokens/tokenSubQueue/tokenSubQueueApi";
 import { callApi } from "@/Utils/request/query";
 
 /**
- * Sets a service point on/off break. Going on break sends a token that was
- * called to it (but not yet being served) back to the waiting list, keeping
- * its place, so the TV stops announcing it. A service point on break is
- * inactive: the TV shows it as "On break" when breaks are shown there.
+ * Sets a service point on/off break. A patient already called to it stays
+ * called to it: the TV hides the call while the service point is on break
+ * (shows "On break") and announces it again as "Now calling" when the doctor
+ * is back. A service point on break is inactive.
  */
 function useServicePointBreak(facilityId: string, queueId: string) {
   const { t } = useTranslation();
@@ -33,30 +37,7 @@ function useServicePointBreak(facilityId: string, queueId: string) {
       servicePoint: TokenSubQueueRead;
       onBreak: boolean;
     }) => {
-      if (onBreak) {
-        const { results: called } = await callApi(tokenApi.list, {
-          pathParams: { facility_id: facilityId, queue_id: queueId },
-          queryParams: {
-            status: TokenStatus.CREATED,
-            sub_queue: servicePoint.id,
-          },
-        });
-        for (const token of called) {
-          await callApi(tokenApi.update, {
-            pathParams: {
-              facility_id: facilityId,
-              queue_id: queueId,
-              id: token.id,
-            },
-            body: {
-              status: TokenStatus.CREATED,
-              note: token.note,
-              sub_queue: null,
-            },
-          });
-        }
-      }
-      return callApi(tokenSubQueueApi.update, {
+      await callApi(tokenSubQueueApi.update, {
         pathParams: { facility_id: facilityId, id: servicePoint.id },
         body: {
           name: servicePoint.name,
@@ -65,6 +46,7 @@ function useServicePointBreak(facilityId: string, queueId: string) {
             : TokenSubQueueStatus.ACTIVE,
         },
       });
+      return calledTokenOf(facilityId, queueId, servicePoint.id);
     },
     onSuccess: (_, { servicePoint, onBreak }) => {
       toast.success(
@@ -77,11 +59,29 @@ function useServicePointBreak(facilityId: string, queueId: string) {
       queryClient.invalidateQueries({ queryKey: ["servicePoints"] });
       queryClient.invalidateQueries({ queryKey: ["tokenSubQueues"] });
       queryClient.invalidateQueries({ queryKey: ["servicePointsOnBreak"] });
+      queryClient.invalidateQueries({ queryKey: ["heldToken"] });
       queryClient.invalidateQueries({
         queryKey: ["infinite-tokens", facilityId, queueId],
       });
     },
   });
+}
+
+/** The patient called to a service point who has not come in yet, if any. */
+async function calledTokenOf(
+  facilityId: string,
+  queueId: string,
+  servicePointId: string,
+) {
+  const { results } = await callApi(tokenApi.list, {
+    pathParams: { facility_id: facilityId, queue_id: queueId },
+    queryParams: {
+      status: TokenStatus.CREATED,
+      sub_queue: servicePointId,
+      limit: 1,
+    },
+  });
+  return results[0] as TokenRead | undefined;
 }
 
 /** One-tap "Go on break" for an active service point. */
@@ -115,9 +115,12 @@ export function GoOnBreakButton({
 export function ServicePointsOnBreak({
   facilityId,
   queueId,
+  onBack,
 }: {
   facilityId: string;
   queueId: string;
+  /** Called with the patient who was called before the break, if any. */
+  onBack?: (token: TokenRead) => void;
 }) {
   const { t } = useTranslation();
   const { resourceType, resourceId } = useScheduleResourceFromPath();
@@ -154,12 +157,26 @@ export function ServicePointsOnBreak({
               {servicePoint.name}
             </span>
             <span className="text-xs text-amber-900">{t("on_break")}</span>
+            <HeldToken
+              facilityId={facilityId}
+              queueId={queueId}
+              servicePointId={servicePoint.id}
+            />
           </div>
           <Button
             variant="primary"
             size="sm"
             disabled={isPending}
-            onClick={() => mutate({ servicePoint, onBreak: false })}
+            onClick={() =>
+              mutate(
+                { servicePoint, onBreak: false },
+                {
+                  onSuccess: (token) => {
+                    if (token) onBack?.(token);
+                  },
+                },
+              )
+            }
           >
             <PlayIcon />
             {t("i_am_back")}
@@ -167,5 +184,33 @@ export function ServicePointsOnBreak({
         </div>
       ))}
     </div>
+  );
+}
+
+/** "MED-005 waiting": the patient called just before the break. */
+function HeldToken({
+  facilityId,
+  queueId,
+  servicePointId,
+}: {
+  facilityId: string;
+  queueId: string;
+  servicePointId: string;
+}) {
+  const { t } = useTranslation();
+  const { data: token } = useQuery({
+    queryKey: ["heldToken", facilityId, queueId, servicePointId],
+    queryFn: () => calledTokenOf(facilityId, queueId, servicePointId),
+  });
+  if (!token) {
+    return null;
+  }
+  return (
+    <span className="text-xs text-amber-900">
+      ·{" "}
+      {t("token_held_for_service_point", {
+        token: renderTokenNumber(token),
+      })}
+    </span>
   );
 }

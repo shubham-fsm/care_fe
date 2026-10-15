@@ -218,7 +218,13 @@ export function ManageQueueOngoingTab({ facilityId, queueId }: Props) {
             }
           >
             <div className="flex flex-col gap-4">
-              <ServicePointsOnBreak facilityId={facilityId} queueId={queueId} />
+              <ServicePointsOnBreak
+                facilityId={facilityId}
+                queueId={queueId}
+                onBack={(token) =>
+                  setQueryParams({ ...qParams, called_token: token.id })
+                }
+              />
               {assignedServicePoints.map((subQueue, index) => (
                 <div key={subQueue.id} className="flex flex-col gap-4">
                   {index > 0 && (
