@@ -15,9 +15,42 @@ type CallNextResult =
   | { kind: "already_called"; token: TokenRead }
   | { kind: "none_waiting" };
 
+const EMERGENCY_CATEGORY = /emergency|urgent|आपात/i;
+const PRIORITY_CATEGORY =
+  /senior|elderly|pregnan|priority|vip|divyang|disab|वरिष्ठ|गर्भवती/i;
+
+/**
+ * Call order of a token's category: 0 emergency, 1 other priority groups
+ * (senior citizens, pregnant women, divyang, VIP), 2 everyone else. A
+ * category can also be marked with `metadata.priority` = "emergency" | true.
+ */
+export function categoryRank(category: TokenRead["category"]) {
+  const flag = category.metadata?.priority;
+  if (flag === "emergency" || EMERGENCY_CATEGORY.test(category.name)) {
+    return 0;
+  }
+  if (flag === true || PRIORITY_CATEGORY.test(category.name)) {
+    return 1;
+  }
+  return 2;
+}
+
+/** Highest-priority waiting token; oldest first within the same priority. */
+function pickNextToken(waiting: TokenRead[]) {
+  let best: TokenRead | undefined;
+  for (const token of waiting) {
+    if (!best || categoryRank(token.category) < categoryRank(best.category)) {
+      best = token;
+    }
+  }
+  return best;
+}
+
 /**
  * Calls the next waiting token of a queue to a service point (sub queue),
  * respecting the service point's preferred token category, if one is set.
+ * Emergency tokens are called first, then other priority groups (senior
+ * citizens, pregnant women, ...), then the rest, each in order of arrival.
  *
  * The token becomes "Called" (still CREATED, now assigned to the service
  * point), so the waiting-area TV announces it as "Now calling" until the
@@ -51,17 +84,17 @@ export function useCallNextToken({
         return { kind: "already_called", token: alreadyCalled[0] };
       }
       const category = preferredCategoryIds[subQueueId];
-      const { results } = await callApi(tokenApi.list, {
+      const { results: waiting } = await callApi(tokenApi.list, {
         pathParams: { facility_id: facilityId, queue_id: queueId },
         queryParams: {
           status: TokenStatus.CREATED,
           sub_queue_is_null: true,
           ordering: "created_date",
-          limit: 1,
+          limit: 100,
           ...(category ? { category } : {}),
         },
       });
-      const next = results[0];
+      const next = pickNextToken(waiting);
       if (!next) {
         return { kind: "none_waiting" };
       }

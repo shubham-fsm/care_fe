@@ -6,6 +6,7 @@ export interface TokenCategory {
   name: string;
   resource_type: SchedulableResourceType;
   shorthand: string;
+  metadata?: Record<string, unknown> | null;
 }
 
 export type TokenCategoryCreate = Omit<TokenCategory, "id">;
