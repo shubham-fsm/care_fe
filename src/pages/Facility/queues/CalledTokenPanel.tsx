@@ -18,7 +18,7 @@ import {
 } from "@/types/tokens/token/token";
 import tokenApi from "@/types/tokens/token/tokenApi";
 import mutate from "@/Utils/request/mutate";
-import query from "@/Utils/request/query";
+import query, { callApi } from "@/Utils/request/query";
 import { formatPatientAge } from "@/Utils/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BringToFront, Megaphone, PlayIcon, XIcon } from "lucide-react";
@@ -75,11 +75,32 @@ export function CalledTokenPanel({
     },
   });
 
-  if (!token || token.status !== TokenStatus.IN_PROGRESS) {
+  const isCalled =
+    !!token &&
+    ((token.status === TokenStatus.CREATED && !!token.sub_queue) ||
+      token.status === TokenStatus.IN_PROGRESS);
+  if (!token || !isCalled) {
     return null;
   }
 
   const markInConsultation = () => {
+    // The patient has arrived: the TV moves the token from "Now calling" to
+    // "In consultation".
+    if (token.status === TokenStatus.CREATED) {
+      callApi(tokenApi.update, {
+        pathParams: { facility_id: facilityId, queue_id: queueId, id: tokenId },
+        body: {
+          status: TokenStatus.IN_PROGRESS,
+          note: token.note,
+          sub_queue: token.sub_queue?.id ?? null,
+        },
+        silent: true,
+      }).finally(() => {
+        queryClient.invalidateQueries({
+          queryKey: ["infinite-tokens", facilityId, queueId],
+        });
+      });
+    }
     const booking = token.booking;
     if (
       booking &&
