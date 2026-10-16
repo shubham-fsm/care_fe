@@ -84,6 +84,8 @@ export interface TokenGenerate extends Omit<Token, "id"> {
   category: string;
   note?: string;
   sub_queue?: string;
+  /** Queue to put the token in; by default the backend picks one. */
+  queue?: string;
 }
 
 export interface TokenGenerateWithQueue extends TokenGenerate {

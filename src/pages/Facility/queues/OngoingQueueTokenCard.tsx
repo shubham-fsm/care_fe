@@ -19,6 +19,10 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { CancelTokenDialog } from "@/pages/Facility/queues/CancelTokenDialog";
+import {
+  canChangeTokenQueue,
+  ChangeTokenQueueSheet,
+} from "@/pages/Facility/queues/ChangeTokenQueueSheet";
 import { useQueueServicePoints } from "@/pages/Facility/queues/useQueueServicePoints";
 import {
   getQueueTokenStatus,
@@ -32,6 +36,7 @@ import mutate from "@/Utils/request/mutate";
 import { callApi } from "@/Utils/request/query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  ArrowRightLeft,
   BringToFront,
   Check,
   CircleDot,
@@ -64,11 +69,13 @@ function useTokenActions({
   token,
   onCancelClick,
   onEnteredInErrorClick,
+  onChangeQueueClick,
 }: {
   facilityId: string;
   token: TokenRead;
   onCancelClick: () => void;
   onEnteredInErrorClick: () => void;
+  onChangeQueueClick: () => void;
 }): TokenActionItem[] {
   const { t } = useTranslation();
   const { assignedServicePoints } = useQueueServicePoints();
@@ -237,6 +244,16 @@ function useTokenActions({
       }),
   });
 
+  if (canChangeTokenQueue(token)) {
+    items.push({
+      key: "change_queue",
+      label: t("change_queue"),
+      icon: <ArrowRightLeft className="size-4 mr-2" />,
+      onSelect: onChangeQueueClick,
+      separatorBefore: true,
+    });
+  }
+
   const cancellable = ![
     TokenStatus.CANCELLED,
     TokenStatus.ENTERED_IN_ERROR,
@@ -324,11 +341,13 @@ function OngoingQueueTokenCardInner({
   setShowEnteredInErrorDialog: (open: boolean) => void;
   t: (key: string, options?: Record<string, unknown>) => string;
 }) {
+  const [showChangeQueue, setShowChangeQueue] = useState(false);
   const actions = useTokenActions({
     facilityId,
     token,
     onCancelClick: () => setShowCancelDialog(true),
     onEnteredInErrorClick: () => setShowEnteredInErrorDialog(true),
+    onChangeQueueClick: () => setShowChangeQueue(true),
   });
 
   // "Encounter" on a patient who is not in a room yet (waiting, or missed and
@@ -439,6 +458,15 @@ function OngoingQueueTokenCardInner({
         onOpenChange={setShowCancelDialog}
         token={token}
       />
+      {showChangeQueue && (
+        <ChangeTokenQueueSheet
+          facilityId={facilityId}
+          queueId={token.queue.id}
+          tokenId={token.id}
+          open={showChangeQueue}
+          onOpenChange={setShowChangeQueue}
+        />
+      )}
       <EnteredInErrorDialog
         open={showEnteredInErrorDialog}
         onOpenChange={setShowEnteredInErrorDialog}

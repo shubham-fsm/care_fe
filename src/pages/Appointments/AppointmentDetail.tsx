@@ -67,6 +67,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addDays, format, isBefore, isWithinInterval, subDays } from "date-fns";
 import {
+  ArrowRightLeft,
   BanIcon,
   CheckCircle2Icon,
   ChevronLeft,
@@ -108,6 +109,10 @@ import { AppointmentSlotPicker } from "@/pages/Appointments/BookAppointment/Appo
 import { TokenCard } from "@/pages/Appointments/components/AppointmentTokenCard";
 import { TokenGenerationSheet } from "@/pages/Appointments/components/TokenGenerationSheet";
 import { QuickAction } from "@/pages/Encounters/tabs/overview/quick-actions";
+import {
+  ChangeTokenQueueSheet,
+  canChangeTokenQueue,
+} from "@/pages/Facility/queues/ChangeTokenQueueSheet";
 import useCurrentFacility from "@/pages/Facility/utils/useCurrentFacility";
 import { ChargeItemServiceResource } from "@/types/billing/chargeItem/chargeItem";
 import { FacilityRead } from "@/types/facility/facility";
@@ -130,6 +135,7 @@ export default function AppointmentDetail(props: Props) {
   const [params, setQueryParams] = useQueryParams();
   const { showSuccess } = params;
   const [{ from_queue }] = useQueryParams();
+  const [isChangeQueueOpen, setIsChangeQueueOpen] = useState(false);
 
   useShortcutSubContext("facility:appointment");
 
@@ -317,6 +323,41 @@ export default function AppointmentDetail(props: Props) {
                     facility={facility}
                   />
                 </div>
+                {canWriteToken &&
+                  !AppointmentFinalStatuses.includes(appointment.status) &&
+                  canChangeTokenQueue(appointment.token) && (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-3"
+                        onClick={() => setIsChangeQueueOpen(true)}
+                      >
+                        <ArrowRightLeft className="size-4" />
+                        {t("change_queue")}
+                      </Button>
+                      {isChangeQueueOpen && (
+                        <ChangeTokenQueueSheet
+                          facilityId={facility.id}
+                          queueId={appointment.token.queue.id}
+                          tokenId={appointment.token.id}
+                          open={isChangeQueueOpen}
+                          onOpenChange={setIsChangeQueueOpen}
+                          onMoved={(_, newAppointmentId) => {
+                            if (newAppointmentId) {
+                              navigate(
+                                `/facility/${facility.id}/patient/${appointment.patient.id}/appointments/${newAppointmentId}`,
+                              );
+                            } else {
+                              queryClient.invalidateQueries({
+                                queryKey: ["appointment", appointment.id],
+                              });
+                            }
+                          }}
+                        />
+                      )}
+                    </>
+                  )}
               </>
             ) : (
               !AppointmentFinalStatuses.includes(appointment.status) &&
