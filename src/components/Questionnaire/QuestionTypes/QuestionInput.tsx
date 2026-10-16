@@ -331,7 +331,11 @@ export function QuestionInput({
           case "diagnosis":
             if (encounterId) {
               return (
-                <DiagnosisQuestion {...commonProps} encounterId={encounterId} />
+                <DiagnosisQuestion
+                  {...commonProps}
+                  encounterId={encounterId}
+                  questionnaireResponses={questionnaireResponses}
+                />
               );
             }
             return <span>{t("questionnaire_diagnosis_no_encounter")}</span>;

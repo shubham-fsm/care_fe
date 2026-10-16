@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/table";
 
 import { HistoricalRecordSelector } from "@/components/HistoricalRecordSelector";
+import { DiagnosisSuggestions } from "@/components/Questionnaire/DiagnosisSuggestions";
 import { EntitySelectionDrawer } from "@/components/Questionnaire/EntitySelectionDrawer";
 import { QuestionLabel } from "@/components/Questionnaire/QuestionLabel";
 import ValueSetSelect from "@/components/Questionnaire/ValueSetSelect";
@@ -87,6 +88,8 @@ interface DiagnosisQuestionProps {
   ) => void;
   disabled?: boolean;
   question: Question;
+  /** All answers of the form, to suggest diagnoses from the complaints */
+  questionnaireResponses?: QuestionnaireResponse[];
 }
 
 const DIAGNOSIS_INITIAL_VALUE: Omit<DiagnosisRequest, "encounter"> = {
@@ -350,6 +353,7 @@ export function DiagnosisQuestion({
   updateQuestionnaireResponseCB,
   disabled,
   question,
+  questionnaireResponses,
 }: DiagnosisQuestionProps) {
   const { t } = useTranslation();
 
@@ -447,6 +451,29 @@ export function DiagnosisQuestion({
       ...DIAGNOSIS_INITIAL_VALUE,
       onset: { onset_datetime: dateQueryString(new Date()) },
     });
+  };
+
+  // A suggestion from the complaints: added as a provisional diagnosis
+  const addSuggestedDiagnosis = (code: Code) => {
+    if (checkForDuplicateDiagnosis(sortedDiagnoses, code, t)) return;
+    updateQuestionnaireResponseCB(
+      [
+        {
+          type: "diagnosis",
+          value: [
+            ...sortedDiagnoses,
+            {
+              ...DIAGNOSIS_INITIAL_VALUE,
+              onset: { onset_datetime: dateQueryString(new Date()) },
+              code,
+              category: selectedCategory,
+              verification_status: "provisional",
+            } as DiagnosisRequest,
+          ],
+        },
+      ],
+      questionnaireResponse.question_id,
+    );
   };
 
   const handleConfirmDiagnosis = () => {
@@ -729,6 +756,17 @@ export function DiagnosisQuestion({
             ))}
           </div>
         </div>
+      )}
+
+      {!isPreview && questionnaireResponses && (
+        <DiagnosisSuggestions
+          patientId={patientId}
+          encounterId={encounterId}
+          questionnaireResponses={questionnaireResponses}
+          diagnoses={sortedDiagnoses}
+          onPick={addSuggestedDiagnosis}
+          disabled={disabled}
+        />
       )}
 
       {isMobile ? (
