@@ -11,7 +11,7 @@ import {
   DiagnosisRule,
   recogniseComplaints,
   suggestDiagnoses,
-} from "@/components/Questionnaire/diagnosisSuggestions";
+} from "@/components/Questionnaire/diagnosisSuggestionRules";
 
 import { Code } from "@/types/base/code/code";
 import { DiagnosisRequest } from "@/types/emr/diagnosis/diagnosis";
