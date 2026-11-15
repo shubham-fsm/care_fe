@@ -1,0 +1,1174 @@
+{
+"pregnancy": {
+"code": "77386006",
+"display": "Pregnancy"
+},
+"cough": {
+"code": "49727002",
+"display": "Cough"
+},
+"fever": {
+"code": "386661006",
+"display": "Fever"
+},
+"abdominal pain": {
+"code": "21522001",
+"display": "Abdominal pain"
+},
+"common cold": {
+"code": "82272006",
+"display": "Common cold"
+},
+"weakness - general": {
+"code": "13791008",
+"display": "Weakness - general"
+},
+"headache": {
+"code": "25064002",
+"display": "Headache"
+},
+"pain": {
+"code": "22253000",
+"display": "Pain"
+},
+"antenatal care status": {
+"code": "243826008",
+"display": "Antenatal care status"
+},
+"chest pain": {
+"code": "29857009",
+"display": "Chest pain"
+},
+"dental caries": {
+"code": "80967001",
+"display": "Dental caries"
+},
+"itching": {
+"code": "418290006",
+"display": "Itching"
+},
+"backache": {
+"code": "161891005",
+"display": "Backache"
+},
+"diabetes mellitus": {
+"code": "73211009",
+"display": "Diabetes mellitus"
+},
+"wound": {
+"code": "416462003",
+"display": "Wound"
+},
+"well baby": {
+"code": "278978003",
+"display": "Well baby"
+},
+"muscle weakness": {
+"code": "26544005",
+"display": "Muscle weakness"
+},
+"gingivitis": {
+"code": "66383009",
+"display": "Gingivitis"
+},
+"disorder of refraction": {
+"code": "39021009",
+"display": "Disorder of refraction"
+},
+"generalised aches and pains": {
+"code": "82991003",
+"display": "Generalised aches and pains"
+},
+"delivery normal": {
+"code": "48782003",
+"display": "Delivery normal"
+},
+"low back pain": {
+"code": "279039007",
+"display": "Low back pain"
+},
+"fitness for work - finding": {
+"code": "365524007",
+"display": "Fitness for work - finding"
+},
+"upper respiratory infection": {
+"code": "54150009",
+"display": "Upper respiratory infection"
+},
+"knee pain": {
+"code": "1003722009",
+"display": "Knee pain"
+},
+"loose stool": {
+"code": "398032003",
+"display": "Loose stool"
+},
+"hypertensive disorder": {
+"code": "38341003",
+"display": "Hypertensive disorder"
+},
+"deliveries by caesarean": {
+"code": "200144004",
+"display": "Deliveries by caesarean"
+},
+"thalassaemia": {
+"code": "40108008",
+"display": "Thalassaemia"
+},
+"dog scratch": {
+"code": "283111009",
+"display": "Dog scratch"
+},
+"vomiting": {
+"code": "422400008",
+"display": "Vomiting"
+},
+"amenorrhoea": {
+"code": "14302001",
+"display": "Amenorrhoea"
+},
+"ankle pain": {
+"code": "247373008",
+"display": "Ankle pain"
+},
+"foot pain": {
+"code": "47933007",
+"display": "Foot pain"
+},
+"fit for work": {
+"code": "160926000",
+"display": "Fit for work"
+},
+"swelling": {
+"code": "65124004",
+"display": "Swelling"
+},
+"presbyopia": {
+"code": "41256004",
+"display": "Presbyopia"
+},
+"irregular periods": {
+"code": "80182007",
+"display": "Irregular periods"
+},
+"neonatal jaundice": {
+"code": "387712008",
+"display": "Neonatal jaundice"
+},
+"pain in lower limb": {
+"code": "10601006",
+"display": "Pain in lower limb"
+},
+"otitis media": {
+"code": "65363002",
+"display": "Otitis media"
+},
+"bleeding": {
+"code": "131148009",
+"display": "Bleeding"
+},
+"neck pain": {
+"code": "81680005",
+"display": "Neck pain"
+},
+"hand pain": {
+"code": "53057004",
+"display": "Hand pain"
+},
+"allergic conjunctivitis": {
+"code": "473460002",
+"display": "Allergic conjunctivitis"
+},
+"cat bite - wound": {
+"code": "283782004",
+"display": "Cat bite - wound"
+},
+"epiphora": {
+"code": "193982009",
+"display": "Epiphora"
+},
+"leg pain": {
+"code": "10601006",
+"display": "Leg pain"
+},
+"acute upper respiratory infection": {
+"code": "54398005",
+"display": "Acute upper respiratory infection"
+},
+"dizziness": {
+"code": "404640003",
+"display": "Dizziness"
+},
+"pericoronitis": {
+"code": "22240003",
+"display": "Pericoronitis"
+},
+"cataract": {
+"code": "193570009",
+"display": "Cataract"
+},
+"htn - hypertension": {
+"code": "38341003",
+"display": "HTN - Hypertension"
+},
+"wrist pain": {
+"code": "56608008",
+"display": "Wrist pain"
+},
+"deep dog bite": {
+"code": "262571007",
+"display": "Deep dog bite"
+},
+"retraction of tympanic membrane": {
+"code": "71177003",
+"display": "Retraction of tympanic membrane"
+},
+"dog bite of foot": {
+"code": "283776002",
+"display": "Dog bite of foot"
+},
+"wax in ear canal": {
+"code": "271739002",
+"display": "Wax in ear canal"
+},
+"gastritis": {
+"code": "4556007",
+"display": "Gastritis"
+},
+"shoulder region pain": {
+"code": "45326000",
+"display": "Shoulder region pain"
+},
+"anaemia": {
+"code": "271737000",
+"display": "Anaemia"
+},
+"heel pain": {
+"code": "2733002",
+"display": "Heel pain"
+},
+"tuberculosis": {
+"code": "56717001",
+"display": "Tuberculosis"
+},
+"sensitivity": {
+"code": "35209006",
+"display": "Sensitivity"
+},
+"menstrual period late": {
+"code": "84292000",
+"display": "Menstrual period late"
+},
+"otomycosis": {
+"code": "53316003",
+"display": "Otomycosis"
+},
+"red eye": {
+"code": "703630003",
+"display": "Red eye"
+},
+"pain in eye": {
+"code": "41652007",
+"display": "Pain in eye"
+},
+"acute gastroenteritis": {
+"code": "69776003",
+"display": "Acute gastroenteritis"
+},
+"dog bite of hand": {
+"code": "283754006",
+"display": "Dog bite of hand"
+},
+"constipation": {
+"code": "14760008",
+"display": "Constipation"
+},
+"injury": {
+"code": "417163006",
+"display": "Injury"
+},
+"hemoptysis": {
+"code": "66857006",
+"display": "Hemoptysis"
+},
+"anemia": {
+"code": "271737000",
+"display": "Anemia"
+},
+"elbow pain": {
+"code": "74323005",
+"display": "Elbow pain"
+},
+"snake bite - wound": {
+"code": "283840005",
+"display": "Snake bite - wound"
+},
+"viral fever": {
+"code": "10151000132103",
+"display": "Viral fever"
+},
+"giddiness": {
+"code": "404641004",
+"display": "Giddiness"
+},
+"neural hearing loss": {
+"code": "73371001",
+"display": "Neural hearing loss"
+},
+"uti - urinary tract infection": {
+"code": "68566005",
+"display": "UTI - Urinary tract infection"
+},
+"uses contraception": {
+"code": "13197004",
+"display": "Uses contraception"
+},
+"joint pain": {
+"code": "57676002",
+"display": "Joint pain"
+},
+"pain of shoulder region": {
+"code": "45326000",
+"display": "Pain of shoulder region"
+},
+"impacted third molar tooth": {
+"code": "196417006",
+"display": "Impacted third molar tooth"
+},
+"breath smells unpleasant": {
+"code": "79879001",
+"display": "Breath smells unpleasant"
+},
+"foreign body sensation": {
+"code": "247342009",
+"display": "Foreign body sensation"
+},
+"otitis externa": {
+"code": "3135009",
+"display": "Otitis externa"
+},
+"staining of teeth": {
+"code": "1162561004",
+"display": "Staining of teeth"
+},
+"hip pain": {
+"code": "49218002",
+"display": "Hip pain"
+},
+"sob - shortness of breath": {
+"code": "267036007",
+"display": "SOB - Shortness of breath"
+},
+"asthenia": {
+"code": "13791008",
+"display": "Asthenia"
+},
+"diarrhoea": {
+"code": "62315008",
+"display": "Diarrhoea"
+},
+"essential hypertension": {
+"code": "59621000",
+"display": "Essential hypertension"
+},
+"foreign body": {
+"code": "125670008",
+"display": "Foreign body"
+},
+"mobile tooth": {
+"code": "283021003",
+"display": "Mobile tooth"
+},
+"pain of wrist region": {
+"code": "56608008",
+"display": "Pain of wrist region"
+},
+"pulmonary tuberculosis": {
+"code": "154283005",
+"display": "Pulmonary tuberculosis"
+},
+"earache": {
+"code": "301354004",
+"display": "Earache"
+},
+"tinea corporis": {
+"code": "84849002",
+"display": "Tinea corporis"
+},
+"injury of head": {
+"code": "82271004",
+"display": "Injury of head"
+},
+"conjunctivitis": {
+"code": "9826008",
+"display": "Conjunctivitis"
+},
+"toothache": {
+"code": "27355003",
+"display": "Toothache"
+},
+"arthritis": {
+"code": "3723001",
+"display": "Arthritis"
+},
+"allergic rhinitis": {
+"code": "61582004",
+"display": "Allergic rhinitis"
+},
+"fracture of bone": {
+"code": "125605004",
+"display": "Fracture of bone"
+},
+"gastrooesophageal reflux disease": {
+"code": "235595009",
+"display": "Gastrooesophageal reflux disease"
+},
+"bleeding gums": {
+"code": "86276007",
+"display": "Bleeding gums"
+},
+"hypothyroidism": {
+"code": "40930008",
+"display": "Hypothyroidism"
+},
+"pain of hip region": {
+"code": "49218002",
+"display": "Pain of hip region"
+},
+"monkey bite - wound": {
+"code": "283787005",
+"display": "Monkey bite - wound"
+},
+"scabies": {
+"code": "128869009",
+"display": "Scabies"
+},
+"urticaria": {
+"code": "126485001",
+"display": "Urticaria"
+},
+"rash": {
+"code": "271807003",
+"display": "Rash"
+},
+"dog bite - wound": {
+"code": "283734005",
+"display": "Dog bite - wound"
+},
+"fissure in ano": {
+"code": "30037006",
+"display": "Fissure in ano"
+},
+"dyspnoea": {
+"code": "267036007",
+"display": "Dyspnoea"
+},
+"cat scratch injury": {
+"code": "403165009",
+"display": "Cat scratch injury"
+},
+"tonsillitis": {
+"code": "90176007",
+"display": "Tonsillitis"
+},
+"burn": {
+"code": "125666000",
+"display": "Burn"
+},
+"pivd - prolapsed intervertebral disc": {
+"code": "73589001",
+"display": "PIVD - Prolapsed intervertebral disc"
+},
+"dysmenorrhoea": {
+"code": "266599000",
+"display": "Dysmenorrhoea"
+},
+"boil": {
+"code": "416675009",
+"display": "Boil"
+},
+"pain in upper limb": {
+"code": "102556003",
+"display": "Pain in upper limb"
+},
+"ulcer": {
+"code": "429040005",
+"display": "Ulcer"
+},
+"typhoid fever": {
+"code": "4834000",
+"display": "Typhoid fever"
+},
+"pain of elbow region": {
+"code": "74323005",
+"display": "Pain of elbow region"
+},
+"eczema": {
+"code": "43116000",
+"display": "Eczema"
+},
+"abscess": {
+"code": "128477000",
+"display": "Abscess"
+},
+"anal fissure": {
+"code": "30037006",
+"display": "Anal fissure"
+},
+"gastroenteritis": {
+"code": "25374005",
+"display": "Gastroenteritis"
+},
+"allergic contact dermatitis": {
+"code": "238575004",
+"display": "Allergic contact dermatitis"
+},
+"hypertension": {
+"code": "38341003",
+"display": "Hypertension"
+},
+"loss of appetite": {
+"code": "79890006",
+"display": "Loss of appetite"
+},
+"osteoarthritis of knee": {
+"code": "239873007",
+"display": "Osteoarthritis of knee"
+},
+"cyst": {
+"code": "441457006",
+"display": "Cyst"
+},
+"normal labour": {
+"code": "35874009",
+"display": "Normal labour"
+},
+"head injury": {
+"code": "82271004",
+"display": "Head injury"
+},
+"root caries": {
+"code": "234975001",
+"display": "Root caries"
+},
+"blood group": {
+"code": "365636006",
+"display": "Blood group"
+},
+"cough with fever": {
+"code": "135883003",
+"display": "Cough with fever"
+},
+"menorrhagia": {
+"code": "386692008",
+"display": "Menorrhagia"
+},
+"low birth weight infant": {
+"code": "276610007",
+"display": "Low birth weight infant"
+},
+"pityriasis versicolor": {
+"code": "56454009",
+"display": "Pityriasis versicolor"
+},
+"scrotal pain": {
+"code": "20502007",
+"display": "Scrotal pain"
+},
+"mobility poor": {
+"code": "160693001",
+"display": "Mobility poor"
+},
+"breast lump": {
+"code": "89164003",
+"display": "Breast lump"
+},
+"delivery by emergency caesarean section": {
+"code": "200149009",
+"display": "Delivery by emergency caesarean section"
+},
+"impetigo": {
+"code": "48277006",
+"display": "Impetigo"
+},
+"oral hygiene finding": {
+"code": "110298001",
+"display": "Oral hygiene finding"
+},
+"lip ulcer": {
+"code": "64143008",
+"display": "Lip ulcer"
+},
+"itching of eye": {
+"code": "74776002",
+"display": "Itching of eye"
+},
+"breathlessness": {
+"code": "267036007",
+"display": "Breathlessness"
+},
+"sickle cell disease": {
+"code": "417357006",
+"display": "Sickle cell disease"
+},
+"worm infestation": {
+"code": "27601005",
+"display": "Worm infestation"
+},
+"type 2 diabetes mellitus": {
+"code": "44054006",
+"display": "Type 2 diabetes mellitus"
+},
+"diabetic foot": {
+"code": "280137006",
+"display": "Diabetic foot"
+},
+"cellulitis": {
+"code": "128045006",
+"display": "Cellulitis"
+},
+"ankle sprain": {
+"code": "44465007",
+"display": "Ankle sprain"
+},
+"skin lesion": {
+"code": "95324001",
+"display": "Skin lesion"
+},
+"deviated nasal septum": {
+"code": "126660000",
+"display": "Deviated nasal septum"
+},
+"medical report sent": {
+"code": "185009000",
+"display": "Medical report sent"
+},
+"dry eyes": {
+"code": "162290004",
+"display": "Dry eyes"
+},
+"lipoma": {
+"code": "93163002",
+"display": "Lipoma"
+},
+"human bite mark": {
+"code": "297963000",
+"display": "Human bite mark"
+},
+"palpitations": {
+"code": "80313002",
+"display": "Palpitations"
+},
+"pain in finger": {
+"code": "18876004",
+"display": "Pain in finger"
+},
+"insect bite - wound": {
+"code": "276433004",
+"display": "Insect bite - wound"
+},
+"epigastric pain": {
+"code": "79922009",
+"display": "Epigastric pain"
+},
+"itching of ear": {
+"code": "699392007",
+"display": "Itching of ear"
+},
+"subconjunctival haemorrhage": {
+"code": "78768009",
+"display": "Subconjunctival haemorrhage"
+},
+"haemorrhoids": {
+"code": "70153002",
+"display": "Haemorrhoids"
+},
+"epistaxis": {
+"code": "249366005",
+"display": "Epistaxis"
+},
+"fungal infection": {
+"code": "3218000",
+"display": "Fungal infection"
+},
+"breast pain": {
+"code": "53430007",
+"display": "Breast pain"
+},
+"lymphadenopathy": {
+"code": "30746006",
+"display": "Lymphadenopathy"
+},
+"dermatitis": {
+"code": "703938007",
+"display": "Dermatitis"
+},
+"lower abdominal pain": {
+"code": "54586004",
+"display": "Lower abdominal pain"
+},
+"inguinal hernia": {
+"code": "396232000",
+"display": "Inguinal hernia"
+},
+"dental fluorosis": {
+"code": "30265004",
+"display": "Dental fluorosis"
+},
+"throat pain": {
+"code": "162397003",
+"display": "Throat pain"
+},
+"failure to gain weight": {
+"code": "36440009",
+"display": "Failure to gain weight"
+},
+"corn - lesion": {
+"code": "201038005",
+"display": "Corn - lesion"
+},
+"migraine": {
+"code": "37796009",
+"display": "Migraine"
+},
+"cervical lymphadenopathy": {
+"code": "127086001",
+"display": "Cervical lymphadenopathy"
+},
+"herpes zoster": {
+"code": "4740000",
+"display": "Herpes zoster"
+},
+"asthma": {
+"code": "195967001",
+"display": "Asthma"
+},
+"acne": {
+"code": "11381005",
+"display": "Acne"
+},
+"infestation by sarcoptes scabiei var hominis": {
+"code": "128869009",
+"display": "Infestation by Sarcoptes scabiei var hominis"
+},
+"pain in toe": {
+"code": "285365001",
+"display": "Pain in toe"
+},
+"leprosy": {
+"code": "81004002",
+"display": "Leprosy"
+},
+"acne vulgaris": {
+"code": "88616000",
+"display": "Acne vulgaris"
+},
+"acute otitis media": {
+"code": "3110003",
+"display": "Acute otitis media"
+},
+"sprain of ankle": {
+"code": "44465007",
+"display": "Sprain of ankle"
+},
+"seborrhoeic dermatitis": {
+"code": "50563003",
+"display": "Seborrhoeic dermatitis"
+},
+"limb pain": {
+"code": "90834002",
+"display": "Limb pain"
+},
+"swelling of lower limb": {
+"code": "449614009",
+"display": "Swelling of lower limb"
+},
+"bilateral cataracts": {
+"code": "95722004",
+"display": "Bilateral cataracts"
+},
+"tooth absent": {
+"code": "234948008",
+"display": "Tooth absent"
+},
+"upper abdominal pain": {
+"code": "83132003",
+"display": "Upper abdominal pain"
+},
+"gout": {
+"code": "90560007",
+"display": "Gout"
+},
+"rheumatoid arthritis": {
+"code": "69896004",
+"display": "Rheumatoid arthritis"
+},
+"pedal oedema": {
+"code": "102576009",
+"display": "Pedal oedema"
+},
+"vertigo": {
+"code": "399153001",
+"display": "Vertigo"
+},
+"chest wall pain": {
+"code": "102588006",
+"display": "Chest wall pain"
+},
+"seizure": {
+"code": "91175000",
+"display": "Seizure"
+},
+"muscle pain": {
+"code": "68962001",
+"display": "Muscle pain"
+},
+"external hordeolum": {
+"code": "1489008",
+"display": "External hordeolum"
+},
+"chronic kidney disease": {
+"code": "709044004",
+"display": "Chronic kidney disease"
+},
+"hyperthyroidism": {
+"code": "34486009",
+"display": "Hyperthyroidism"
+},
+"vitiligo": {
+"code": "56727007",
+"display": "Vitiligo"
+},
+"pain in limb": {
+"code": "90834002",
+"display": "Pain in limb"
+},
+"irregular menstruation": {
+"code": "80182007",
+"display": "Irregular menstruation"
+},
+"tinnitus": {
+"code": "60862001",
+"display": "Tinnitus"
+},
+"right sided chest pain": {
+"code": "285386001",
+"display": "Right sided chest pain"
+},
+"poisoning due to bite of scorpion": {
+"code": "217670007",
+"display": "Poisoning due to bite of scorpion"
+},
+"myalgia": {
+"code": "68962001",
+"display": "Myalgia"
+},
+"tinea cruris": {
+"code": "399029005",
+"display": "Tinea cruris"
+},
+"menstrual disorder": {
+"code": "386804004",
+"display": "Menstrual disorder"
+},
+"fever with chills": {
+"code": "274640006",
+"display": "Fever with chills"
+},
+"retention of urine": {
+"code": "267064002",
+"display": "Retention of urine"
+},
+"malaria": {
+"code": "61462000",
+"display": "Malaria"
+},
+"noisy respiration": {
+"code": "248573009",
+"display": "Noisy respiration"
+},
+"kidney stone": {
+"code": "95570007",
+"display": "Kidney stone"
+},
+"vaginal bleeding": {
+"code": "289530006",
+"display": "Vaginal bleeding"
+},
+"hearing loss": {
+"code": "15188001",
+"display": "Hearing loss"
+},
+"paronychia": {
+"code": "71906005",
+"display": "Paronychia"
+},
+"hematuria": {
+"code": "34436003",
+"display": "Hematuria"
+},
+"injury of knee": {
+"code": "125601008",
+"display": "Injury of knee"
+},
+"abscess of breast": {
+"code": "28432003",
+"display": "Abscess of breast"
+},
+"scalp injury": {
+"code": "212400009",
+"display": "Scalp injury"
+},
+"psoriasis": {
+"code": "9014002",
+"display": "Psoriasis"
+},
+"vaginal discharge": {
+"code": "271939006",
+"display": "Vaginal discharge"
+},
+"ingrowing nail": {
+"code": "400097005",
+"display": "Ingrowing nail"
+},
+"acute tonsillitis": {
+"code": "17741008",
+"display": "Acute tonsillitis"
+},
+"failure to thrive": {
+"code": "54840006",
+"display": "Failure to thrive"
+},
+"retained foreign body in eye": {
+"code": "82576008",
+"display": "Retained foreign body in eye"
+},
+"bell's palsy": {
+"code": "193093009",
+"display": "Bell's palsy"
+},
+"numbness": {
+"code": "44077006",
+"display": "Numbness"
+},
+"onychomycosis": {
+"code": "414941008",
+"display": "Onychomycosis"
+},
+"leukorrhoea": {
+"code": "237101004",
+"display": "Leukorrhoea"
+},
+"foreign body in eye": {
+"code": "82576008",
+"display": "Foreign body in eye"
+},
+"blood in urine": {
+"code": "34436003",
+"display": "Blood in urine"
+},
+"goitre": {
+"code": "3716002",
+"display": "Goitre"
+},
+"thalassemia": {
+"code": "40108008",
+"display": "Thalassemia"
+},
+"local infection of wound": {
+"code": "76844004",
+"display": "Local infection of wound"
+},
+"wound infection": {
+"code": "76844004",
+"display": "Wound infection"
+},
+"diplopia": {
+"code": "24982008",
+"display": "Diplopia"
+},
+"insomnia": {
+"code": "193462001",
+"display": "Insomnia"
+},
+"nocturnal enuresis": {
+"code": "8009008",
+"display": "Nocturnal enuresis"
+},
+"submandibular lymphadenopathy": {
+"code": "127082004",
+"display": "Submandibular lymphadenopathy"
+},
+"post-term pregnancy": {
+"code": "90968009",
+"display": "Post-term pregnancy"
+},
+"dental abscess": {
+"code": "299709002",
+"display": "Dental abscess"
+},
+"furuncle": {
+"code": "416675009",
+"display": "Furuncle"
+},
+"gluteal abscess": {
+"code": "64576003",
+"display": "Gluteal abscess"
+},
+"mastitis": {
+"code": "266579006",
+"display": "Mastitis"
+},
+"dengue": {
+"code": "38362002",
+"display": "Dengue"
+},
+"tinea capitis": {
+"code": "5441008",
+"display": "Tinea capitis"
+},
+"urinary tract infection": {
+"code": "68566005",
+"display": "Urinary tract infection"
+},
+"well child": {
+"code": "102506008",
+"display": "Well child"
+},
+"aphthous ulcer of mouth": {
+"code": "426965005",
+"display": "Aphthous ulcer of mouth"
+},
+"filariasis": {
+"code": "105706003",
+"display": "Filariasis"
+},
+"immunisation due": {
+"code": "171279008",
+"display": "Immunisation due"
+},
+"perianal abscess": {
+"code": "82127005",
+"display": "Perianal abscess"
+},
+"dengue fever": {
+"code": "38362002",
+"display": "Dengue fever"
+},
+"hemorrhoids": {
+"code": "70153002",
+"display": "Hemorrhoids"
+},
+"nasal discharge": {
+"code": "64531003",
+"display": "Nasal discharge"
+},
+"angular cheilitis": {
+"code": "266429005",
+"display": "Angular cheilitis"
+},
+"excessive crying of infant": {
+"code": "788918005",
+"display": "Excessive crying of infant"
+},
+"cervical radiculopathy": {
+"code": "54404000",
+"display": "Cervical radiculopathy"
+},
+"heat stroke": {
+"code": "52072009",
+"display": "Heat stroke"
+},
+"upper gastrointestinal bleeding": {
+"code": "37372002",
+"display": "Upper gastrointestinal bleeding"
+},
+"double vision": {
+"code": "24982008",
+"display": "Double vision"
+},
+"costochondritis": {
+"code": "64109004",
+"display": "Costochondritis"
+},
+"pins and needles": {
+"code": "62507009",
+"display": "Pins and needles"
+},
+"axillary lymphadenopathy": {
+"code": "127189005",
+"display": "Axillary lymphadenopathy"
+},
+"mumps": {
+"code": "36989005",
+"display": "Mumps"
+},
+"disease caused by filarioidea": {
+"code": "105706003",
+"display": "Disease caused by Filarioidea"
+},
+"anxiety disorder": {
+"code": "197480006",
+"display": "Anxiety disorder"
+},
+"skin rash": {
+"code": "271807003",
+"display": "Skin rash"
+},
+"alopecia": {
+"code": "56317004",
+"display": "Alopecia"
+},
+"sciatica": {
+"code": "23056005",
+"display": "Sciatica"
+},
+"periorbital oedema": {
+"code": "49563000",
+"display": "Periorbital oedema"
+},
+"peripheral neuropathy": {
+"code": "302226006",
+"display": "Peripheral neuropathy"
+},
+"frontal headache": {
+"code": "267096005",
+"display": "Frontal headache"
+},
+"alcohol dependence": {
+"code": "66590003",
+"display": "Alcohol dependence"
+},
+"tinea pedis": {
+"code": "6020002",
+"display": "Tinea pedis"
+},
+"abscess of thigh": {
+"code": "3507004",
+"display": "Abscess of thigh"
+},
+"cerebrovascular accident": {
+"code": "230690007",
+"display": "Cerebrovascular accident"
+},
+"abnormal uterine bleeding": {
+"code": "44991000119100",
+"display": "Abnormal uterine bleeding"
+},
+"inguinal lymphadenopathy": {
+"code": "127199000",
+"display": "Inguinal lymphadenopathy"
+},
+"left sided chest pain": {
+"code": "285385002",
+"display": "Left sided chest pain"
+},
+"tobacco user": {
+"code": "110483000",
+"display": "Tobacco user"
+},
+"acute sinusitis": {
+"code": "15805002",
+"display": "Acute sinusitis"
+}
+}
