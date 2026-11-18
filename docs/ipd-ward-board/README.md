@@ -23,7 +23,16 @@ Lines inside `[[ ... ]]` are skipped when an optional filter is left empty.
 
 ## Ward list (Sadar Hospital Ramgarh)
 
-IPD wards: Male Ward, Female Ward, Post-op Ward, MTC Ward, SNCU Ward, Pediatric Ward.
+IPD ward names as they appear in CARE (copy them exactly):
+
+| Dropdown value | Note |
+|---|---|
+| `MTC Ward` | |
+| `SNCU` | No "Ward" in the name |
+| `Pediatric Ward` | |
+| `Labour Ward /Post OP Ward` | One location; the space sits before the `/` and none after it |
+| Male ward | Exact name still to be confirmed from CARE |
+| Female ward | Exact name still to be confirmed from CARE |
 
 - The filter compares `{{ward}}` with the name of the **parent location of the bed** in CARE (`pl.name`). Each dropdown value must therefore match the ward's location name in CARE exactly, including spaces and case. Copy the names from CARE's Locations page before you set up the dropdown.
 - This works only when each bed sits directly under its ward location (Ward → Bed). If a facility has another level, such as Ward → Room → Bed, the query must be changed to walk up to the ward.
