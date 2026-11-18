@@ -16,10 +16,18 @@ The prototype has been tested on local CARE with seeded demo data only. It has *
 | Tag | Embedding setting | Notes |
 |---|---|---|
 | `{{facility_id}}` | **Locked** | CARE sends the facility's external id in the signed embed token, so a user cannot switch to another facility |
-| `{{ward}}` | Editable, optional | Dropdown with a static list of location names, for example Male Ward and Female Ward |
+| `{{ward}}` | Editable, optional | Dropdown with a static list of ward names (see below) |
 | `{{gender}}` | Editable, optional | Dropdown: male / female / transgender / non_binary |
 
 Lines inside `[[ ... ]]` are skipped when an optional filter is left empty.
+
+## Ward list (Sadar Hospital Ramgarh)
+
+IPD wards: Male Ward, Female Ward, Post-op Ward, MTC Ward, SNCU Ward, Pediatric Ward.
+
+- The filter compares `{{ward}}` with the name of the **parent location of the bed** in CARE (`pl.name`). Each dropdown value must therefore match the ward's location name in CARE exactly, including spaces and case. Copy the names from CARE's Locations page before you set up the dropdown.
+- This works only when each bed sits directly under its ward location (Ward → Bed). If a facility has another level, such as Ward → Room → Bed, the query must be changed to walk up to the ward.
+- SNCU and MTC hold newborns and children, so the gender filter will usually be left empty there.
 
 ## Assumptions to review
 
