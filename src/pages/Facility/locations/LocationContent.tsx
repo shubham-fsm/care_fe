@@ -341,6 +341,7 @@ export default function LocationContent({
             {selectedLocation?.mode === "kind" && (
               <Button variant="outline" size="sm" asChild>
                 <Link
+                  basePath="/"
                   href={`/facility/${facilityId}/locations/${selectedLocation.id}/ward_board`}
                 >
                   <ClipboardList className="size-4" />

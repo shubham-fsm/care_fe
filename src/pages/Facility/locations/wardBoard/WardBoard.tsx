@@ -259,6 +259,7 @@ export default function WardBoard({ facilityId, locationId }: Props) {
                 )}
               </div>
               <Link
+                basePath="/"
                 href={`/facility/${facilityId}/patient/${p.encounter.patient.id}/encounter/${p.encounter.id}/medicines`}
                 className="flex items-center gap-1 text-sm text-primary-700 hover:underline"
               >
