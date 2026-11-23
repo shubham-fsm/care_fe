@@ -7,6 +7,7 @@ import AppointmentDetail from "@/pages/Appointments/AppointmentDetail";
 import AppointmentsPage from "@/pages/Appointments/AppointmentsPage";
 import PrintAppointments from "@/pages/Appointments/components/PrintAppointments";
 import BedsList from "@/pages/Facility/locations/BedsList";
+import WardBoard from "@/pages/Facility/locations/wardBoard/WardBoard";
 import { ManageQueuePage } from "@/pages/Facility/queues/ManageQueue";
 import QueuesIndex from "@/pages/Facility/queues/QueuesIndex";
 import { InventoryList } from "@/pages/Facility/services/inventory/InventoryList";
@@ -47,6 +48,10 @@ interface LocationLayoutProps {
 const getRoutes = (facilityId: string, locationId: string) => ({
   // Beds
   "/beds": () => <BedsList facilityId={facilityId} locationId={locationId} />,
+  // Ward Board (today's medicine rounds + tests for patients in this ward)
+  "/ward_board": () => (
+    <WardBoard facilityId={facilityId} locationId={locationId} />
+  ),
   // Pharmacy
   "/medication_requests": () => (
     <MedicationRequestList facilityId={facilityId} locationId={locationId} />

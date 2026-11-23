@@ -1,5 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Bed, Eye, Loader2, Lock } from "lucide-react";
+import {
+  ArrowRight,
+  Bed,
+  ClipboardList,
+  Eye,
+  Loader2,
+  Lock,
+} from "lucide-react";
+import { Link } from "raviger";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -330,6 +338,16 @@ export default function LocationContent({
             <h2 className="text-lg font-semibold whitespace-nowrap">
               {selectedLocation ? selectedLocation.name : t("locations")}
             </h2>
+            {selectedLocation?.mode === "kind" && (
+              <Button variant="outline" size="sm" asChild>
+                <Link
+                  href={`/facility/${facilityId}/locations/${selectedLocation.id}/ward_board`}
+                >
+                  <ClipboardList className="size-4" />
+                  {t("ward_board")}
+                </Link>
+              </Button>
+            )}
           </div>
           <div className="w-full sm:w-72 shrink-0">
             <Input

@@ -6,7 +6,7 @@ import { NavMain } from "@/components/ui/sidebar/nav-main";
 
 import useCurrentLocation from "@/pages/Facility/locations/utils/useCurrentLocation";
 import useCurrentFacility from "@/pages/Facility/utils/useCurrentFacility";
-import { CalendarIcon, Logs } from "lucide-react";
+import { CalendarIcon, ClipboardList, Logs } from "lucide-react";
 
 export function LocationNav() {
   const { t } = useTranslation();
@@ -23,6 +23,11 @@ export function LocationNav() {
           name: t("beds"),
           url: `${baseUrl}/beds`,
           icon: <CareIcon icon="l-bed" />,
+        },
+        {
+          name: t("ward_board"),
+          url: `${baseUrl}/ward_board`,
+          icon: <ClipboardList />,
         },
         {
           name: t("laboratory"),
