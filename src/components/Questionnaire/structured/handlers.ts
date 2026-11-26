@@ -11,7 +11,15 @@ interface StructuredHandlerContext {
   patientId: string;
   encounterId?: string;
   facilityId?: string;
+  /** True when the question is coded as admission advice (see below). */
+  isAdmissionAdvice?: boolean;
 }
+
+// Questions coded with LOINC 46241-6 (hospital admission) hold the admission
+// advice the OPD doctor writes. Prototype choice; the final code is for product. Medicines in such a question are
+// saved as an inpatient proposal: inactive in the OP encounter, and started in
+// the IP encounter when the nurse admits the patient.
+export const ADMISSION_ADVICE_CODE = "46241-6";
 
 type StructuredHandler<T extends StructuredQuestionType> = {
   getRequests: (
@@ -57,7 +65,10 @@ export const structuredHandlers: {
     },
   },
   medication_request: {
-    getRequests: async (medications, { patientId, encounterId }) => {
+    getRequests: async (
+      medications,
+      { patientId, encounterId, isAdmissionAdvice },
+    ) => {
       // Only submit medications that have been modified (dirty)
       const dirtyMedications = medications.filter((m) => m.dirty);
 
@@ -85,6 +96,12 @@ export const structuredHandlers: {
               encounter: encounterId,
               patient: patientId,
               requester: medication.requester?.id,
+              ...(isAdmissionAdvice &&
+                !medication.id && {
+                  status: "draft" as const,
+                  intent: "proposal" as const,
+                  category: "inpatient" as const,
+                }),
             })),
           },
           reference_id: "medication_request",

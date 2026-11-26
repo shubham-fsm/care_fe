@@ -15,6 +15,7 @@ import { SymptomsList } from "@/components/Patient/symptoms/list";
 import { VitalsList } from "@/components/Patient/vitals/list";
 import { ObservationPlotConfig } from "@/types/emr/observation/observation";
 
+import { AdmissionAdviceFromOpd } from "@/pages/Encounters/tabs/overview/AdmissionAdviceFromOpd";
 import { ClinicalHistoryOverview } from "@/pages/Encounters/tabs/overview/clinical-history-overview";
 import { FavoriteFormsQuickActions } from "@/pages/Encounters/tabs/overview/FavoriteFormsQuickActions";
 import { FormSubmissionDrafts } from "@/pages/Encounters/tabs/overview/FormSubmissionDrafts";
@@ -59,6 +60,7 @@ export const EncounterOverviewTab = () => {
                 encounterId={encounterId}
               />
             )}
+            <AdmissionAdviceFromOpd />
             {<ClinicalHistoryOverview />}
 
             <div className="xl:hidden">

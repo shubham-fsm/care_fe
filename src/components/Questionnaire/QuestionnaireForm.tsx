@@ -56,9 +56,29 @@ import { validateMedicationStatementQuestion } from "./QuestionTypes/MedicationS
 import { isQuestionEnabled } from "./QuestionTypes/QuestionGroup";
 import { QuestionnaireSearch } from "./QuestionnaireSearch";
 import { FIXED_QUESTIONNAIRES } from "./data/StructuredFormData";
-import { getStructuredRequests } from "./structured/handlers";
+import {
+  ADMISSION_ADVICE_CODE,
+  getStructuredRequests,
+} from "./structured/handlers";
 
 import queryClient from "@/Utils/request/queryClient";
+
+// True if the question, or a group it sits in, is coded as admission advice.
+function isAdmissionAdviceQuestion(
+  questions: Question[] = [],
+  questionId: string,
+  inAdmissionGroup = false,
+): boolean {
+  for (const q of questions) {
+    const coded = inAdmissionGroup || q.code?.code === ADMISSION_ADVICE_CODE;
+    if (q.id === questionId) return coded;
+    if (q.questions?.length) {
+      if (isAdmissionAdviceQuestion(q.questions, questionId, coded))
+        return true;
+    }
+  }
+  return false;
+}
 
 export interface QuestionnaireFormState {
   questionnaire: QuestionnaireRead;
@@ -838,7 +858,13 @@ export function QuestionnaireForm({
                 getStructuredRequests(
                   response.structured_type,
                   structuredData,
-                  context,
+                  {
+                    ...context,
+                    isAdmissionAdvice: isAdmissionAdviceQuestion(
+                      form.questionnaire.questions,
+                      response.question_id,
+                    ),
+                  },
                 ),
               );
             }
